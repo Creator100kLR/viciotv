@@ -249,7 +249,42 @@
   .player-wrap:fullscreen iframe,.player-wrap:-webkit-full-screen iframe{width:100%;height:100%}
 
   /* ===== CONTINUAR VIENDO ===== */
-  #muzaflix-cw-container{padding:0 0 8px}
+  #viciotv-cw-container{padding:0 0 8px}
+
+  /* ===== PROFILE EDIT SCREEN ===== */
+  #profile-edit-screen{position:fixed;inset:0;background:var(--bg);z-index:6500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:20px}
+  #profile-edit-screen.open{display:flex}
+  .profile-edit-title{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--text)}
+  .profile-edit-avatar-wrap{position:relative;cursor:pointer}
+  .profile-edit-avatar-wrap img{width:100px;height:100px;border-radius:16px;object-fit:cover;border:2px solid var(--accent)}
+  .edit-avatar-overlay{position:absolute;inset:0;border-radius:16px;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:1.6rem}
+  .profile-edit-avatar-wrap:hover .edit-avatar-overlay{opacity:1}
+  .profile-edit-name-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:13px 18px;color:var(--text);font-family:'Outfit',sans-serif;font-size:1rem;width:320px;max-width:90vw;outline:none;text-align:center;transition:border-color .2s}
+  .profile-edit-name-input:focus{border-color:var(--accent)}
+  .profile-edit-name-input::placeholder{color:var(--text3)}
+  .profile-edit-actions{display:flex;gap:14px;margin-top:6px}
+  .profile-edit-cancel-btn{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--text2);padding:11px 28px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9rem;cursor:pointer;transition:all .2s}
+  .profile-edit-cancel-btn:hover{border-color:var(--text);color:var(--text)}
+  .profile-edit-save-btn{background:var(--accent);border:none;color:#fff;padding:11px 28px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;opacity:.5;pointer-events:none;transition:opacity .2s}
+  .profile-edit-save-btn.enabled{opacity:1;pointer-events:all}
+  #profile-edit-delete-btn{background:transparent;border:1px solid rgba(255,60,60,.4);color:#ff6b6b;padding:9px 22px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.85rem;cursor:pointer;display:none;transition:background .2s}
+  #profile-edit-delete-btn:hover{background:rgba(255,60,60,.15)}
+
+  /* ===== AVATAR PICKER SCREEN ===== */
+  #avatar-picker-screen{position:fixed;inset:0;background:var(--bg);z-index:7000;display:none;flex-direction:column;align-items:center;overflow-y:auto}
+  #avatar-picker-screen.open{display:flex}
+  .avatar-picker-header{width:100%;max-width:860px;padding:32px 20px 20px;text-align:center}
+  .avatar-picker-header h2{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--text)}
+  .avatar-picker-body{width:100%;max-width:860px;padding:0 20px 40px;display:flex;flex-direction:column;gap:28px}
+  .avatar-category-title{font-size:.85rem;font-weight:600;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+  .avatar-grid{display:flex;flex-wrap:wrap;gap:12px}
+  .avatar-option{width:72px;height:72px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:border-color .2s,transform .2s;flex-shrink:0}
+  .avatar-option img{width:100%;height:100%;object-fit:cover;display:block}
+  .avatar-option:hover{transform:scale(1.1);border-color:rgba(255,255,255,.5)}
+  .avatar-option.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(229,9,20,.4)}
+  .avatar-picker-footer{width:100%;max-width:860px;display:flex;justify-content:center;padding:16px 20px 36px}
+  .avatar-picker-cancel-btn{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--text2);padding:11px 36px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9rem;cursor:pointer;transition:all .2s}
+  .avatar-picker-cancel-btn:hover{border-color:var(--text);color:var(--text)}
 
   .focusable{outline:none}
   .focusable:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
@@ -286,19 +321,32 @@
 </div>
 
 <!-- ===== MODAL CREAR PERFIL ===== -->
-<div id="create-profile-modal">
-  <div class="create-box">
-    <h2 id="create-modal-title">Nuevo Perfil</h2>
-    <div class="emoji-picker" id="emoji-picker"></div>
-    <input class="create-input focusable" id="profile-name-input" type="text" placeholder="Nombre del perfil..." maxlength="20" />
-    <div class="create-btns">
-      <button class="btn-cancel focusable" onclick="closeCreateProfile()">Cancelar</button>
-      <button class="btn-create focusable" onclick="confirmCreateProfile()">Guardar</button>
-    </div>
+
+<!-- ===== PROFILE EDIT SCREEN ===== -->
+<div id="profile-edit-screen">
+  <h2 class="profile-edit-title" id="profile-edit-title-text">Nuevo</h2>
+  <div class="profile-edit-avatar-wrap" id="profile-edit-avatar-wrap">
+    <img id="profile-edit-avatar-img" src="" alt="Avatar" />
+    <div class="edit-avatar-overlay">✏️</div>
   </div>
+  <input id="profile-edit-name" class="profile-edit-name-input" type="text" placeholder="Nombre del perfil" maxlength="24" autocomplete="off" />
+  <div class="profile-edit-actions">
+    <button class="profile-edit-cancel-btn" id="profile-edit-cancel-btn">Cancelar</button>
+    <button class="profile-edit-save-btn" id="profile-edit-save-btn">Guardar</button>
+  </div>
+  <button id="profile-edit-delete-btn">🗑 Eliminar perfil</button>
 </div>
 
-<!-- ===== NAV ===== -->
+<!-- ===== AVATAR PICKER SCREEN ===== -->
+<div id="avatar-picker-screen">
+  <div class="avatar-picker-header">
+    <h2>Elegí tu avatar</h2>
+  </div>
+  <div class="avatar-picker-body" id="avatar-picker-body"></div>
+  <div class="avatar-picker-footer">
+    <button class="avatar-picker-cancel-btn" id="avatar-picker-cancel-btn">Cancelar</button>
+  </div>
+</div>
 <nav id="nav" style="display:none">
   <div class="logo focusable" tabindex="0" onclick="showHome()">VicioTV</div>
   <div class="nav-tabs">
@@ -346,7 +394,7 @@
 <main id="main" style="display:none">
 
   <!-- Continuar Viendo -->
-  <div id="muzaflix-cw-container"></div>
+  <div id="viciotv-cw-container"></div>
 
   <!-- Mi Lista -->
   <div class="row-section" id="section-favs" style="display:none">
@@ -561,7 +609,7 @@ window.viciotvTrackContinueWatching = function(item) {
 };
 function renderContinueWatching() {
   const history = getContinueWatching();
-  const cwEl = document.getElementById("muzaflix-cw-container");
+  const cwEl = document.getElementById("viciotv-cw-container");
   if (!history.length) { cwEl.innerHTML = ""; return; }
   cwEl.innerHTML = `
     <div class="row-section">
@@ -1287,11 +1335,7 @@ window.addEventListener("scroll", () => {
   document.getElementById("nav").classList.toggle("scrolled", window.scrollY > 50);
 });
 
-/* ─── PERFILES (pantalla inicial) ─── */
-const EMOJIS = ["😎","🎬","🍿","👑","🦁","🐺","🦊","🐱","🎭","🎮","🚀","🌙","⚡","🔥","💎","🎯"];
-let selectedEmoji = EMOJIS[0];
-let editingProfile = null;
-
+/* ─── PERFILES ─── */
 function renderProfiles() {
   const profiles = getProfiles();
   const grid = document.getElementById("profiles-grid");
@@ -1299,31 +1343,21 @@ function renderProfiles() {
   profiles.forEach((p, idx) => {
     const item = document.createElement("div");
     item.className = "profile-item";
-    const avatarContent = p.img
-      ? `<img src="${p.img}" alt="${p.name}">`
-      : `<span style="font-size:48px">${p.emoji || "😎"}</span>`;
+    const avatarUrl = p.avatar || getAvatarUrl("bottts", p.name, "#e50914");
     item.innerHTML = `
       <div class="profile-avatar" style="background:${p.color||"#1a1a26"}">
-        ${avatarContent}
-        <div class="profile-delete" title="Eliminar">✕</div>
+        <img src="${avatarUrl}" alt="${p.name}">
+        <div class="profile-delete" title="Editar">✏️</div>
       </div>
       <span class="profile-name">${p.name}</span>`;
+    // Click en lápiz → abrir editor
     item.querySelector(".profile-delete").addEventListener("click", e => {
       e.stopPropagation();
-      if (!profileEditMode) return;
-      if (confirm(`¿Eliminar perfil "${p.name}"?`)) {
-        ["viciotv_favs","viciotv_continue_watching","viciotv_progress"].forEach(k =>
-          localStorage.removeItem(`${k}__${p.name}`));
-        const profs = getProfiles();
-        profs.splice(idx, 1);
-        saveProfiles(profs);
-        if (sessionStorage.getItem("viciotv_current_profile") === p.name)
-          sessionStorage.removeItem("viciotv_current_profile");
-        renderProfiles();
-      }
+      openProfileEdit(idx);
     });
+    // Click en card → seleccionar perfil
     item.addEventListener("click", () => {
-      if (profileEditMode) return;
+      if (profileEditMode) { openProfileEdit(idx); return; }
       sessionStorage.setItem("viciotv_current_profile", p.name);
       document.getElementById("profiles-screen").style.display = "none";
       document.getElementById("nav").style.display   = "";
@@ -1339,22 +1373,19 @@ function renderProfiles() {
   // Agregar perfil
   const add = document.createElement("div");
   add.className = "profile-item profile-add";
-  add.innerHTML = `<div class="profile-avatar"><span>+</span></div><span class="profile-name">Agregar perfil</span>`;
-  add.addEventListener("click", () => openCreateProfile(null));
+  add.innerHTML = `<div class="profile-avatar"><span style="font-size:40px;color:var(--text3)">+</span></div><span class="profile-name">Agregar perfil</span>`;
+  add.addEventListener("click", () => openProfileEdit(null));
   grid.appendChild(add);
 }
 function toggleProfileEdit() {
   profileEditMode = !profileEditMode;
   document.getElementById("profiles-edit-btn").textContent = profileEditMode ? "Listo" : "Editar perfiles";
-  document.querySelectorAll(".profile-delete").forEach(d => {
-    d.style.display = profileEditMode ? "flex" : "";
-  });
 }
 function updateNavProfile(p) {
   const avatarEl = document.getElementById("nav-avatar");
   const nameEl   = document.getElementById("nav-name");
-  if (p.img) avatarEl.innerHTML = `<img src="${p.img}" alt="${p.name}">`;
-  else avatarEl.innerHTML = `<span style="font-size:18px">${p.emoji||"😎"}</span>`;
+  const avatarUrl = p.avatar || getAvatarUrl("bottts", p.name, "#e50914");
+  avatarEl.innerHTML = `<img src="${avatarUrl}" alt="${p.name}">`;
   nameEl.textContent = p.name;
 }
 function goToProfiles() {
@@ -1362,45 +1393,6 @@ function goToProfiles() {
   document.getElementById("profiles-edit-btn").textContent = "Editar perfiles";
   document.getElementById("profiles-screen").style.display = "flex";
 }
-function openCreateProfile(p) {
-  editingProfile = p;
-  selectedEmoji = p?.emoji || EMOJIS[0];
-  document.getElementById("create-modal-title").textContent = p ? "Editar perfil" : "Nuevo Perfil";
-  document.getElementById("profile-name-input").value = p?.name || "";
-  const picker = document.getElementById("emoji-picker");
-  picker.innerHTML = "";
-  EMOJIS.forEach(em => {
-    const opt = document.createElement("div");
-    opt.className = "emoji-opt" + (em === selectedEmoji ? " selected" : "");
-    opt.textContent = em;
-    opt.addEventListener("click", () => {
-      selectedEmoji = em;
-      picker.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("selected"));
-      opt.classList.add("selected");
-    });
-    picker.appendChild(opt);
-  });
-  document.getElementById("create-profile-modal").classList.add("open");
-  document.getElementById("profile-name-input").focus();
-}
-function closeCreateProfile() {
-  document.getElementById("create-profile-modal").classList.remove("open");
-}
-function confirmCreateProfile() {
-  const name = document.getElementById("profile-name-input").value.trim();
-  if (!name) return;
-  const colors = ["#1a0a2e","#0a1a2e","#0a2e0a","#2e1a0a","#2e0a0a","#0a2e2e"];
-  const color  = colors[Math.floor(Math.random() * colors.length)];
-  const profiles = getProfiles();
-  const existing = profiles.findIndex(p => p.name === editingProfile?.name);
-  if (existing >= 0) profiles[existing] = { ...profiles[existing], name, emoji: selectedEmoji };
-  else profiles.push({ name, emoji: selectedEmoji, color });
-  saveProfiles(profiles);
-  renderProfiles();
-  closeCreateProfile();
-}
-document.getElementById("profile-name-input").addEventListener("keydown", e => { if (e.key === "Enter") confirmCreateProfile(); });
-
 /* ─── DEEP LINK ─── */
 async function handleDeepLink() {
   const hash  = window.location.hash;
@@ -1472,6 +1464,208 @@ document.addEventListener("keydown", e => {
     if (document.getElementById("modal-overlay").classList.contains("open")) { e.preventDefault(); closeModal(); }
     else if (document.getElementById("search-overlay").classList.contains("open")) { closeSearchResults(); }
   }
+});
+
+/* ─── SISTEMA DE AVATARES (dicebear) ─── */
+const AVATAR_CATEGORIES = [
+  {
+    title: "Clásicos",
+    avatars: [
+      { seed: "Wink",    style: "fun-emoji", bg: "#e84118" },
+      { seed: "Tounge",  style: "fun-emoji", bg: "#9c88ff" },
+      { seed: "Giggle",  style: "fun-emoji", bg: "#4cd137" },
+      { seed: "Ghosty",  style: "fun-emoji", bg: "#6c5ce7" },
+      { seed: "Cheeky",  style: "fun-emoji", bg: "#fbc531" },
+      { seed: "Blushy",  style: "fun-emoji", bg: "#ff7675" },
+      { seed: "Aneke?eyes=shades&mouth=wideSmile", style: "fun-emoji", bg: "#be2edd" },
+      { seed: "Buddy",   style: "fun-emoji", bg: "#badc58" },
+    ]
+  },
+  {
+    title: "Personajes",
+    avatars: [
+      { seed: "adventurer-Alex", style: "adventurer", bg: "#2980b9" },
+      { seed: "adventurer-Mia",  style: "adventurer", bg: "#c0392b" },
+      { seed: "adventurer-Sam",  style: "adventurer", bg: "#8e44ad" },
+      { seed: "adventurer-Jade", style: "adventurer", bg: "#16a085" },
+      { seed: "adventurer-Cole", style: "adventurer", bg: "#f39c12" },
+      { seed: "adventurer-Vera", style: "adventurer", bg: "#2c3e50" },
+      { seed: "adventurer-Omar", style: "adventurer", bg: "#d35400" },
+      { seed: "adventurer-Nina", style: "adventurer", bg: "#1abc9c" },
+    ]
+  },
+  {
+    title: "Pixel Art",
+    avatars: [
+      { seed: "pixel-Alpha",   style: "pixel-art", bg: "#6c3483" },
+      { seed: "pixel-Beta",    style: "pixel-art", bg: "#1a5276" },
+      { seed: "pixel-Gamma",   style: "pixel-art", bg: "#1e8449" },
+      { seed: "pixel-Delta",   style: "pixel-art", bg: "#784212" },
+      { seed: "pixel-Epsilon", style: "pixel-art", bg: "#922b21" },
+      { seed: "pixel-Zeta",    style: "pixel-art", bg: "#154360" },
+      { seed: "pixel-Eta",     style: "pixel-art", bg: "#0e6251" },
+      { seed: "pixel-Theta",   style: "pixel-art", bg: "#4d1b6e" },
+    ]
+  },
+  {
+    title: "Dibujos",
+    avatars: [
+      { seed: "lorelei-1", style: "big-smile", bg: "#d6a2e8" },
+      { seed: "lorelei-2", style: "big-smile", bg: "#f8a5c2" },
+      { seed: "lorelei-3", style: "big-smile", bg: "#badc58" },
+      { seed: "lorelei-4", style: "big-smile", bg: "#78e08f" },
+      { seed: "lorelei-5", style: "big-smile", bg: "#60a3bc" },
+      { seed: "lorelei-6", style: "big-smile", bg: "#f9ca24" },
+      { seed: "lorelei-7", style: "big-smile", bg: "#e55039" },
+      { seed: "lorelei-8", style: "big-smile", bg: "#2980b9" },
+    ]
+  }
+];
+
+function getAvatarUrl(style, seed, bg) {
+  const bgHex = bg.replace("#", "");
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bgHex}`;
+}
+
+/* ─── PROFILE EDIT SCREEN ─── */
+let editingProfileIdx = null;
+let pendingAvatar     = null;
+
+const profileEditScreen  = document.getElementById("profile-edit-screen");
+const profileEditAvtImg  = document.getElementById("profile-edit-avatar-img");
+const profileEditAvtWrap = document.getElementById("profile-edit-avatar-wrap");
+const profileEditName    = document.getElementById("profile-edit-name");
+const profileEditSave    = document.getElementById("profile-edit-save-btn");
+const profileEditCancel  = document.getElementById("profile-edit-cancel-btn");
+const profileEditDelete  = document.getElementById("profile-edit-delete-btn");
+const avatarPickerScreen = document.getElementById("avatar-picker-screen");
+const avatarPickerBody   = document.getElementById("avatar-picker-body");
+const avatarPickerCancel = document.getElementById("avatar-picker-cancel-btn");
+
+function openProfileEdit(idx) {
+  editingProfileIdx = idx;
+  pendingAvatar = null;
+  document.getElementById("profiles-screen").style.display = "none";
+  const profiles = getProfiles();
+
+  if (idx !== null && profiles[idx]) {
+    const p = profiles[idx];
+    document.getElementById("profile-edit-title-text").textContent = p.name || "Editar";
+    profileEditName.value   = p.name || "";
+    profileEditAvtImg.src   = p.avatar || getAvatarUrl("bottts", p.name, "#e50914");
+    profileEditDelete.style.display = "inline-block";
+  } else {
+    document.getElementById("profile-edit-title-text").textContent = "Nuevo";
+    profileEditName.value = "";
+    const def = AVATAR_CATEGORIES[0].avatars[Math.floor(Math.random() * AVATAR_CATEGORIES[0].avatars.length)];
+    profileEditAvtImg.src = getAvatarUrl(def.style, def.seed, def.bg);
+    pendingAvatar = profileEditAvtImg.src;
+    profileEditDelete.style.display = "none";
+  }
+  updateProfileSaveBtn();
+  profileEditScreen.classList.add("open");
+}
+
+function closeProfileEdit() {
+  profileEditScreen.classList.remove("open");
+  document.getElementById("profiles-screen").style.display = "flex";
+}
+
+function updateProfileSaveBtn() {
+  if (profileEditName.value.trim().length > 0) profileEditSave.classList.add("enabled");
+  else profileEditSave.classList.remove("enabled");
+}
+
+profileEditName.addEventListener("input", () => {
+  if (editingProfileIdx === null) {
+    document.getElementById("profile-edit-title-text").textContent = profileEditName.value || "Nuevo";
+  }
+  updateProfileSaveBtn();
+});
+
+profileEditCancel.addEventListener("click", closeProfileEdit);
+
+profileEditSave.addEventListener("click", () => {
+  const name = profileEditName.value.trim();
+  if (!name) return;
+  const profiles = getProfiles();
+  const avatar = pendingAvatar || profileEditAvtImg.src;
+  const oldName = (editingProfileIdx !== null && profiles[editingProfileIdx]) ? profiles[editingProfileIdx].name : null;
+  if (editingProfileIdx !== null && profiles[editingProfileIdx]) {
+    profiles[editingProfileIdx].name   = name;
+    profiles[editingProfileIdx].avatar = avatar;
+    if (oldName && sessionStorage.getItem("viciotv_current_profile") === oldName) {
+      sessionStorage.setItem("viciotv_current_profile", name);
+    }
+  } else {
+    profiles.push({ name, avatar });
+  }
+  saveProfiles(profiles);
+  // Actualizar badge nav si es el perfil activo
+  const activeNow = sessionStorage.getItem("viciotv_current_profile");
+  const activeP   = profiles.find(p => p.name === (name === oldName ? name : name));
+  if (activeP && activeP.name === activeNow) updateNavProfile(activeP);
+  renderProfiles();
+  closeProfileEdit();
+});
+
+profileEditDelete.addEventListener("click", () => {
+  if (editingProfileIdx === null) return;
+  const profiles = getProfiles();
+  const target   = profiles[editingProfileIdx];
+  if (!target) return;
+  if (!confirm(`¿Eliminar el perfil "${target.name}"?\nSe borrarán sus favoritos y progreso.`)) {
+    closeProfileEdit();
+    renderProfiles();
+    return;
+  }
+  ["viciotv_favs", "viciotv_continue_watching", "viciotv_progress"].forEach(base =>
+    localStorage.removeItem(`${base}__${target.name}`));
+  profiles.splice(editingProfileIdx, 1);
+  saveProfiles(profiles);
+  if (sessionStorage.getItem("viciotv_current_profile") === target.name)
+    sessionStorage.removeItem("viciotv_current_profile");
+  renderProfiles();
+  closeProfileEdit();
+});
+
+/* ─── AVATAR PICKER ─── */
+profileEditAvtWrap.addEventListener("click", openAvatarPicker);
+
+function openAvatarPicker() {
+  if (!avatarPickerBody.hasChildNodes()) {
+    AVATAR_CATEGORIES.forEach(cat => {
+      const section = document.createElement("div");
+      section.innerHTML = `<div class="avatar-category-title">${cat.title}</div>`;
+      const grid = document.createElement("div");
+      grid.className = "avatar-grid";
+      cat.avatars.forEach(av => {
+        const url = getAvatarUrl(av.style, av.seed, av.bg);
+        const opt = document.createElement("div");
+        opt.className = "avatar-option";
+        opt.dataset.url = url;
+        opt.innerHTML = `<img src="${url}" alt="${av.seed}" loading="lazy">`;
+        opt.addEventListener("click", () => {
+          document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("selected"));
+          opt.classList.add("selected");
+          pendingAvatar = url;
+          profileEditAvtImg.src = url;
+          avatarPickerScreen.classList.remove("open");
+          profileEditScreen.classList.add("open");
+        });
+        grid.appendChild(opt);
+      });
+      section.appendChild(grid);
+      avatarPickerBody.appendChild(section);
+    });
+  }
+  profileEditScreen.classList.remove("open");
+  avatarPickerScreen.classList.add("open");
+}
+
+avatarPickerCancel.addEventListener("click", () => {
+  avatarPickerScreen.classList.remove("open");
+  profileEditScreen.classList.add("open");
 });
 
 // ─── ARRANQUE ───
