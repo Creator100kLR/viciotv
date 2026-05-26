@@ -1035,6 +1035,7 @@ function loadHeroFeatured() { initHero(); }
 
 /* ─── MODAL ─── */
 async function openModal(item) {
+  activeProvider = "streamimdb"; // Reset al servidor principal en cada película
   currentItem = item;
   currentType = item._type || "movie";
   const title  = item.title || item.name || "Sin título";
