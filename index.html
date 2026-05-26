@@ -674,41 +674,14 @@ let catalogObserver = null;
 /* ══════════════════════════════════════════
    ROUTER DE HASH
 ══════════════════════════════════════════ */
+/* ─── navigate: llamado desde botones/tabs (SÍ pushea al historial) ─── */
 function navigate(route, pushState = true) {
   if (pushState) history.pushState({ route }, "", `#/${route}`);
-  _doRoute(route);
+  _doRouteInternal(route);
 }
 
-function _doRoute(route) {
-  const si = document.getElementById("search-input");
-  if (si) si.value = "";
-  document.getElementById("search-overlay").classList.remove("open");
-
-  // Asegurar app visible antes de rutear
-  _ensureAppVisible();
-
-  if (route === "home" || route === "") {
-    showHome();
-    return;
-  }
-
-  // deep link modal (#movie-123 o #tv-456)
-  const deepMatch = route.match(/^(movie|tv)-(\d+)$/);
-  if (deepMatch) { openDeepLink(deepMatch[1], deepMatch[2]); return; }
-
-  if (ROUTES[route]) {
-    openCatalog(route);
-    return;
-  }
-
-  showHome();
-}
-
-function _ensureAppVisible() {
-  document.getElementById("nav").style.display  = "";
-  document.getElementById("hero").style.display = "";
-  document.getElementById("main").style.display = "";
-}
+/* ─── _doRoute: alias público para popstate ─── */
+function _doRoute(route){ _doRouteInternal(route); }
 
 window.addEventListener("popstate", e => {
   const route = (e.state?.route) || window.location.hash.replace(/^#\/?/, "");
@@ -1333,7 +1306,7 @@ document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.targe
 window.addEventListener("popstate",e=>{
   if(document.getElementById("modal").classList.contains("forced-fullscreen")){document.getElementById("modal").classList.remove("forced-fullscreen");document.getElementById("fs-btn").textContent="⛶";try{screen.orientation?.unlock?.();}catch{}}
   else if(document.getElementById("modal-overlay").classList.contains("open")){_doCloseModal();}
-  else{ const route=(e.state?.route)||window.location.hash.replace(/^#\/?/,""); _doRoute(route||"home"); }
+  else{ const route=(e.state?.route)||getHashRoute(); _doRouteInternal(route||"home"); }
 });
 document.getElementById("modal-overview").addEventListener("click",function(){this.classList.toggle("expanded");});
 document.getElementById("fav-btn").addEventListener("click",()=>{if(currentItem)toggleFav(currentItem);});
@@ -1398,9 +1371,7 @@ function renderProfiles(){
 }
 function selectProfile(p){
   sessionStorage.setItem("viciotv_current_profile",p.name);
-  document.getElementById("profiles-screen").style.display="none";
-  _ensureAppVisible();
-  updateNavProfile(p);renderFavs();renderCW();_launchAfterProfile();
+  launchApp(p);
 }
 function updateNavProfile(p){
   const avatarUrl=p.avatar||getAvatarUrl("bottts",p.name,"#e50914");
@@ -1537,12 +1508,6 @@ window.addEventListener("appinstalled",()=>{document.getElementById("pwa-btn").s
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
 
 /* INIT */
-/* ─ Ruta pendiente: se guarda al cargar la página y se ejecuta tras elegir perfil ─ */
-const _pendingRoute = (()=>{
-  const h = window.location.hash.replace(/^#\/?/,"");
-  return (h && h !== "home") ? h : null;
-})();
-
 function initContent(){
   if(_contentInited)return;_contentInited=true;
   loadCarousel("carousel-popular",    "/movie/popular",     "movie");
@@ -1554,27 +1519,49 @@ function initContent(){
   clearInterval(heroInterval);heroInterval=setInterval(loadHeroFeatured,25000);
 }
 
-function _launchAfterProfile(){
+/* ─── Leer ruta del hash ─── */
+function getHashRoute(){
+  // hash puede ser: "#/movies/popular" o "#movies/popular" o ""
+  return window.location.hash.replace(/^#\/?/,"").trim();
+}
+
+/* ─── Mostrar app y procesar ruta ─── */
+function launchApp(profile){
+  document.getElementById("profiles-screen").style.display="none";
+  document.getElementById("nav").style.display="";
+  document.getElementById("main").style.display="";
+  document.getElementById("hero").style.display="";
+  if(profile) updateNavProfile(profile);
+  renderFavs();
+  renderCW();
   initContent();
-  if(_pendingRoute){
-    // Dar tiempo a que el DOM esté visible antes de rutear
-    setTimeout(()=>_doRoute(_pendingRoute), 80);
+  const route = getHashRoute();
+  if(route && route !== "home"){
+    setTimeout(()=>_doRouteInternal(route), 100);
+  } else {
+    showHome();
   }
+}
+
+/* ─── Router interno (sin tocar el historial) ─── */
+function _doRouteInternal(route){
+  document.getElementById("search-overlay").classList.remove("open");
+  if(!route || route==="home"){ showHome(); return; }
+  const deepMatch = route.match(/^(movie|tv)-(\d+)$/);
+  if(deepMatch){ openDeepLink(deepMatch[1],deepMatch[2]); return; }
+  if(ROUTES[route]){ openCatalog(route); return; }
+  showHome();
 }
 
 function initApp(){
   renderProfiles();
-  const saved=sessionStorage.getItem("viciotv_current_profile");
+  const saved = sessionStorage.getItem("viciotv_current_profile");
   if(saved){
-    const p=getProfiles().find(q=>q.name===saved);
-    _ensureAppVisible();
-    document.getElementById("profiles-screen").style.display="none";
-    if(p)updateNavProfile(p);
-    renderFavs();renderCW();_launchAfterProfile();
+    const p = getProfiles().find(q=>q.name===saved);
+    launchApp(p||null);
   }
-  // Si hay ruta pendiente sin perfil guardado, igual mostrar la app
-  // después de que el usuario elija perfil (selectProfile ya llama initContent)
-  // pero si el hash es solo /home o vacío, quedarse en profiles-screen
+  // Si no hay sesión → se queda en profiles-screen
+  // selectProfile() se encarga de llamar launchApp() cuando el usuario elige
 }
 initApp();
 </script>
