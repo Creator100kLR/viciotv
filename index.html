@@ -1399,10 +1399,8 @@ function renderProfiles(){
 function selectProfile(p){
   sessionStorage.setItem("viciotv_current_profile",p.name);
   document.getElementById("profiles-screen").style.display="none";
-  document.getElementById("nav").style.display="";
-  document.getElementById("hero").style.display="";
-  document.getElementById("main").style.display="";
-  updateNavProfile(p);renderFavs();renderCW();initContent();
+  _ensureAppVisible();
+  updateNavProfile(p);renderFavs();renderCW();_launchAfterProfile();
 }
 function updateNavProfile(p){
   const avatarUrl=p.avatar||getAvatarUrl("bottts",p.name,"#e50914");
@@ -1539,6 +1537,12 @@ window.addEventListener("appinstalled",()=>{document.getElementById("pwa-btn").s
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
 
 /* INIT */
+/* ─ Ruta pendiente: se guarda al cargar la página y se ejecuta tras elegir perfil ─ */
+const _pendingRoute = (()=>{
+  const h = window.location.hash.replace(/^#\/?/,"");
+  return (h && h !== "home") ? h : null;
+})();
+
 function initContent(){
   if(_contentInited)return;_contentInited=true;
   loadCarousel("carousel-popular",    "/movie/popular",     "movie");
@@ -1549,21 +1553,28 @@ function initContent(){
   loadHeroFeatured();
   clearInterval(heroInterval);heroInterval=setInterval(loadHeroFeatured,25000);
 }
+
+function _launchAfterProfile(){
+  initContent();
+  if(_pendingRoute){
+    // Dar tiempo a que el DOM esté visible antes de rutear
+    setTimeout(()=>_doRoute(_pendingRoute), 80);
+  }
+}
+
 function initApp(){
   renderProfiles();
   const saved=sessionStorage.getItem("viciotv_current_profile");
   if(saved){
-    const p=getProfiles().find(p=>p.name===saved);
+    const p=getProfiles().find(q=>q.name===saved);
     _ensureAppVisible();
     document.getElementById("profiles-screen").style.display="none";
     if(p)updateNavProfile(p);
-    renderFavs();renderCW();initContent();
-    // Procesar ruta inicial DESPUÉS de que initContent arrancó los carruseles
-    const hash=window.location.hash.replace(/^#\/?/,"");
-    if(hash&&hash!=="home"&&hash!==""){
-      setTimeout(()=>_doRoute(hash),50);
-    }
+    renderFavs();renderCW();_launchAfterProfile();
   }
+  // Si hay ruta pendiente sin perfil guardado, igual mostrar la app
+  // después de que el usuario elija perfil (selectProfile ya llama initContent)
+  // pero si el hash es solo /home o vacío, quedarse en profiles-screen
 }
 initApp();
 </script>
