@@ -1205,9 +1205,18 @@ function _resetMovieFrame() {
 }
 document.getElementById("close-btn").addEventListener("click", closeModal);
 document.getElementById("modal-overlay").addEventListener("click", e => {
-  // Cerrar si el click es en el overlay o en el padding (fuera del modal blanco)
   const modal = document.getElementById("modal");
   if (!modal.contains(e.target)) closeModal();
+});
+
+// Cerrar modal al hacer scroll en el overlay (el modal "sube" y queda oculto)
+document.getElementById("modal-overlay").addEventListener("scroll", () => {
+  const overlay = document.getElementById("modal-overlay");
+  const modal   = document.getElementById("modal");
+  if (!overlay.classList.contains("open")) return;
+  const rect = modal.getBoundingClientRect();
+  // Si el modal está completamente fuera de la pantalla hacia arriba → cerrar
+  if (rect.bottom < 0) closeModal();
 });
 window.addEventListener("popstate", e => {
   if (document.getElementById("modal").classList.contains("forced-fullscreen")) {
@@ -1337,6 +1346,10 @@ document.addEventListener("click", e => {
 
 /* ─── TABS ─── */
 function switchTab(tab) {
+  // Si hay un modal abierto, cerrarlo primero (mata el audio)
+  if (document.getElementById("modal-overlay").classList.contains("open")) {
+    _doCloseModal();
+  }
   activeTab = tab;
   document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
 
@@ -1580,6 +1593,9 @@ function setupInfiniteScroll(){
 }
 
 function showHome() {
+  if (document.getElementById("modal-overlay").classList.contains("open")) {
+    _doCloseModal();
+  }
   closeSearchResults();
   document.getElementById("search-input").value = "";
   switchTab("inicio");
