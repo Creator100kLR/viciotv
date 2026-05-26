@@ -283,6 +283,13 @@ html,body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif
 #toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;transition:transform .3s ease;pointer-events:none}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
+/* ── PROVIDER SELECTOR ── */
+.provider-bar{display:flex;align-items:center;gap:6px;padding:10px 24px 4px;flex-wrap:wrap}
+.provider-label{font-size:11px;color:var(--text3);margin-right:4px;flex-shrink:0}
+.provider-btn{background:var(--bg3);border:1px solid rgba(255,255,255,.1);color:var(--text2);border-radius:6px;padding:5px 10px;font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.provider-btn:hover{border-color:rgba(255,255,255,.3);color:var(--text)}
+.provider-btn.active{background:rgba(229,9,20,.15);color:var(--accent);border-color:rgba(229,9,20,.4);font-weight:600}
+
 .focusable{outline:none}
 .focusable:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 
@@ -467,7 +474,11 @@ html,body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <p class="player-note">🎬 StreamIMDb · Usá ⛶ para pantalla completa</p>
+    <p class="player-note">Usá ⛶ para pantalla completa · Si no carga, cambiá de servidor</p>
+    <!-- PROVIDER BAR -->
+    <div class="provider-bar" id="provider-bar">
+      <span class="provider-label">🖥️ Servidor:</span>
+    </div>
     <div id="tv-selectors">
       <select class="tv-select focusable" id="sel-season"></select>
       <select class="tv-select focusable" id="sel-episode"></select>
@@ -516,13 +527,105 @@ html,body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif
 /* ══════════════════════════════════════════
    CONSTANTES
 ══════════════════════════════════════════ */
-const API_KEY      = "2a351e4a4f1c08a69ec5ce4d1075d1eb";
-const API_BASE     = "https://api.themoviedb.org/3";
-const STREAM_MOVIE = "https://streamimdb.ru/embed/movie/";
-const STREAM_TV    = "https://streamimdb.ru/embed/tv/";
-const IMG_W500     = "https://image.tmdb.org/t/p/w500";
-const IMG_W1280    = "https://image.tmdb.org/t/p/w1280";
-const FAV_KEY      = "viciotv_favs";
+const API_KEY  = "2a351e4a4f1c08a69ec5ce4d1075d1eb";
+const API_BASE = "https://api.themoviedb.org/3";
+const IMG_W500 = "https://image.tmdb.org/t/p/w500";
+const IMG_W1280= "https://image.tmdb.org/t/p/w1280";
+const FAV_KEY  = "viciotv_favs";
+
+/* ══════════════════════════════════════════
+   PROVEEDORES DE STREAMING
+   Orden: mejor calidad / más latino primero
+══════════════════════════════════════════ */
+const PROVIDERS = [
+  {
+    id: "streamimdb",
+    name: "StreamIMDb",
+    flag: "🎬",
+    note: "Principal",
+    movie: id => `https://streamimdb.ru/embed/movie/${id}/`,
+    tv:    (id,s,e) => `https://streamimdb.ru/embed/tv/${id}/${s}/${e}`,
+    usesImdb: true,  // necesita IMDb ID
+  },
+  {
+    id: "vidsrc",
+    name: "VidSrc",
+    flag: "📡",
+    note: "Multi-servidor",
+    movie: id => `https://vidsrc.xyz/embed/movie?tmdb=${id}`,
+    tv:    (id,s,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
+    usesImdb: false,
+  },
+  {
+    id: "superembed",
+    name: "SuperEmbed",
+    flag: "⚡",
+    note: "10+ servidores · subtítulos",
+    movie: id => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
+    tv:    (id,s,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`,
+    usesImdb: false,
+  },
+  {
+    id: "embedsu",
+    name: "Embed.su",
+    flag: "🌐",
+    note: "Rápido · Latino disponible",
+    movie: id => `https://embed.su/embed/movie/${id}`,
+    tv:    (id,s,e) => `https://embed.su/embed/tv/${id}/${s}/${e}`,
+    usesImdb: false,
+  },
+  {
+    id: "vidlink",
+    name: "VidLink",
+    flag: "🔗",
+    note: "Latino · autoplay",
+    movie: id => `https://vidlink.pro/movie/${id}?autoplay=true&primaryColor=e50914`,
+    tv:    (id,s,e) => `https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true&primaryColor=e50914`,
+    usesImdb: false,
+  },
+  {
+    id: "2embed",
+    name: "2Embed",
+    flag: "🎥",
+    note: "Anime · Latino",
+    movie: id => `https://www.2embed.stream/embed/movie/${id}`,
+    tv:    (id,s,e) => `https://www.2embed.stream/embed/tv/${id}/${s}/${e}`,
+    usesImdb: false,
+  },
+  {
+    id: "moviesapi",
+    name: "MoviesAPI",
+    flag: "🍿",
+    note: "HD · múltiples calidades",
+    movie: id => `https://moviesapi.club/movie/${id}`,
+    tv:    (id,s,e) => `https://moviesapi.club/tv/${id}-${s}-${e}`,
+    usesImdb: false,
+  },
+  {
+    id: "autoembed",
+    name: "AutoEmbed",
+    flag: "🤖",
+    note: "Agrega múltiples fuentes",
+    movie: id => `https://autoembed.cc/movie/tmdb/${id}`,
+    tv:    (id,s,e) => `https://autoembed.cc/tv/tmdb/${id}-${s}-${e}`,
+    usesImdb: false,
+  },
+];
+
+let activeProvider = localStorage.getItem("viciotv_provider") || "vidsrc";
+function getProvider() {
+  return PROVIDERS.find(p => p.id === activeProvider) || PROVIDERS[1];
+}
+function setProvider(id) {
+  activeProvider = id;
+  localStorage.setItem("viciotv_provider", id);
+}
+function buildPlayerUrl(type, tmdbId, imdbId, season=1, episode=1) {
+  const p = getProvider();
+  const id = (p.usesImdb && imdbId) ? imdbId : tmdbId;
+  if (!id) return "";
+  return type === "movie" ? p.movie(id) : p.tv(id, season, episode);
+}
 
 /* ══════════════════════════════════════════
    RUTAS — catálogos disponibles
@@ -577,15 +680,19 @@ function navigate(route, pushState = true) {
 }
 
 function _doRoute(route) {
-  document.getElementById("search-input").value = "";
+  const si = document.getElementById("search-input");
+  if (si) si.value = "";
   document.getElementById("search-overlay").classList.remove("open");
+
+  // Asegurar app visible antes de rutear
+  _ensureAppVisible();
 
   if (route === "home" || route === "") {
     showHome();
     return;
   }
 
-  // modal por deep link (#movie-123 o #tv-456)
+  // deep link modal (#movie-123 o #tv-456)
   const deepMatch = route.match(/^(movie|tv)-(\d+)$/);
   if (deepMatch) { openDeepLink(deepMatch[1], deepMatch[2]); return; }
 
@@ -595,6 +702,12 @@ function _doRoute(route) {
   }
 
   showHome();
+}
+
+function _ensureAppVisible() {
+  document.getElementById("nav").style.display  = "";
+  document.getElementById("hero").style.display = "";
+  document.getElementById("main").style.display = "";
 }
 
 window.addEventListener("popstate", e => {
@@ -1094,10 +1207,9 @@ async function openModal(item) {
     // Similar
     const similar=detail.similar?.results?.slice(0,9)||[];
     if(similar.length){ document.getElementById("modal-similar-section").style.display=""; const sg=document.getElementById("similar-grid"); similar.forEach(s=>{ const c=document.createElement("div"); c.className="similar-card"; c.innerHTML=`${s.poster_path?`<img src="${IMG_W500}${s.poster_path}" alt="" loading="lazy">`:'<div style="background:#222;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;color:#555;font-size:.7rem">Sin imagen</div>'}<div class="similar-card-rating">★${s.vote_average?.toFixed(1)||"?"}</div><div class="similar-card-title">${s.title||s.name||""}</div>`; c.addEventListener("click",()=>openModal({...s,_type:currentType})); sg.appendChild(c); }); }
-    // Player
+    // Obtener IMDb ID (siempre, lo necesitan algunos providers)
     if(currentType==="movie"){
       currentImdbId=detail.imdb_id||null;
-      if(currentImdbId) movieFrame.src=`${STREAM_MOVIE}${currentImdbId}/`;
     } else {
       currentSeasons=detail.number_of_seasons||1;
       const ext=await cachedFetch(`${API_BASE}/tv/${item.id}/external_ids?api_key=${API_KEY}`);
@@ -1107,7 +1219,14 @@ async function openModal(item) {
       buildEpisodePanel(item.id,currentSeasons);
       const saved=getProgress(item.id);
       if(saved?.season){ document.getElementById("sel-season").value=saved.season; try{ const sData=await cachedFetch(`${API_BASE}/tv/${item.id}/season/${saved.season}?api_key=${API_KEY}`); buildEpisodeOptions((sData.episodes||[]).length||20); }catch{ buildEpisodeOptions(20); } document.getElementById("sel-episode").value=saved.episode||1; }
-      if(currentImdbId) loadTVEpisode();
+    }
+    // Construir barra de proveedores y cargar player
+    buildProviderBar();
+    if(currentType==="movie"){
+      const url=buildPlayerUrl("movie", item.id, currentImdbId);
+      if(url) movieFrame.src=url;
+    } else {
+      loadTVEpisode();
     }
   } catch(e){ console.error(e); }
 }
@@ -1158,9 +1277,40 @@ document.getElementById("tv-load-btn").addEventListener("click",()=>{ if(current
 function loadTVEpisode(forceS,forceE){
   const s=Number(forceS??document.getElementById("sel-season").value??1)||1;
   const e=Number(forceE??document.getElementById("sel-episode").value??1)||1;
+  const url=buildPlayerUrl("tv", currentItem?.id, currentImdbId, s, e);
   movieFrame.src="about:blank";
-  setTimeout(()=>{ movieFrame.src=`${STREAM_TV}${currentImdbId}/${s}/${e}`; if(currentItem) saveProgress(currentItem,s,e,0); },120);
+  setTimeout(()=>{ if(url) movieFrame.src=url; if(currentItem) saveProgress(currentItem,s,e,0); },120);
   clearTimeout(nextEpTimer); nextEpTimer=setTimeout(()=>{ document.getElementById("next-episode-overlay").style.display="flex"; },1000*60*40);
+}
+
+/* ── PROVIDER BAR ── */
+function buildProviderBar(){
+  const bar=document.getElementById("provider-bar"); if(!bar) return;
+  // Keep label, rebuild buttons
+  bar.innerHTML='<span class="provider-label">🖥️ Servidor:</span>';
+  PROVIDERS.forEach(p=>{
+    const btn=document.createElement("button");
+    btn.className="provider-btn"+(p.id===activeProvider?" active":"");
+    btn.textContent=`${p.flag} ${p.name}`;
+    btn.title=p.note||"";
+    btn.addEventListener("click",()=>{
+      if(p.id===activeProvider) return;
+      setProvider(p.id);
+      bar.querySelectorAll(".provider-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      btn.classList.add("loading");
+      // Reload player with new provider
+      if(currentType==="movie"){
+        const url=buildPlayerUrl("movie",currentItem?.id,currentImdbId);
+        movieFrame.src="about:blank";
+        setTimeout(()=>{ movieFrame.src=url; btn.classList.remove("loading"); },120);
+      } else {
+        loadTVEpisode();
+        setTimeout(()=>btn.classList.remove("loading"),300);
+      }
+    });
+    bar.appendChild(btn);
+  });
 }
 document.getElementById("play-next-btn").addEventListener("click",()=>{
   let s=Number(document.getElementById("sel-season").value),e=Number(document.getElementById("sel-episode").value); e++;
@@ -1398,20 +1548,21 @@ function initContent(){
   loadCarousel("carousel-top-rated",  "/movie/top_rated",   "movie");
   loadHeroFeatured();
   clearInterval(heroInterval);heroInterval=setInterval(loadHeroFeatured,25000);
-  const hash=window.location.hash.replace(/^#\/?/,"");
-  if(hash&&hash!=="home")_doRoute(hash);
 }
 function initApp(){
   renderProfiles();
   const saved=sessionStorage.getItem("viciotv_current_profile");
   if(saved){
     const p=getProfiles().find(p=>p.name===saved);
+    _ensureAppVisible();
     document.getElementById("profiles-screen").style.display="none";
-    document.getElementById("nav").style.display="";
-    document.getElementById("hero").style.display="";
-    document.getElementById("main").style.display="";
     if(p)updateNavProfile(p);
     renderFavs();renderCW();initContent();
+    // Procesar ruta inicial DESPUÉS de que initContent arrancó los carruseles
+    const hash=window.location.hash.replace(/^#\/?/,"");
+    if(hash&&hash!=="home"&&hash!==""){
+      setTimeout(()=>_doRoute(hash),50);
+    }
   }
 }
 initApp();
