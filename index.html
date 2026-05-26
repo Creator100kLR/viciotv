@@ -473,7 +473,7 @@
         </div>
       </div>
     </div>
-    <p class="player-note">Si no carga, cambiá de servidor · Usá ⛶ para pantalla completa</p>
+    <p class="player-note">🎬 StreamIMDb · <span id="sub-tip">Para subtítulos en español: apretá <strong style="color:var(--text)">CC</strong> dentro del player y elegí <strong style="color:var(--text)">Spanish</strong> — se recuerda para siempre</span> · Usá ⛶ para pantalla completa</p>
     <div class="provider-bar" id="provider-bar"><span class="provider-label">🖥️ Servidor:</span></div>
 
     <!-- TV Selectors -->
@@ -923,6 +923,9 @@ async function openModal(item) {
   updateFavBtn(item);
 
   document.getElementById("modal-overlay").classList.add("open");
+  // Mostrar/ocultar tip de subtítulos
+  const subTip = document.getElementById("sub-tip");
+  if(subTip) subTip.style.display = localStorage.getItem("viciotv_sub_tip_seen") ? "none" : "";
   document.body.style.overflow = "hidden";
   history.pushState({ modal: true }, "");
 
