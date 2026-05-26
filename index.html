@@ -473,7 +473,11 @@
         </div>
       </div>
     </div>
-    <p class="player-note">🎬 StreamIMDb · <span id="sub-tip">Para subtítulos en español: apretá <strong style="color:var(--text)">CC</strong> dentro del player y elegí <strong style="color:var(--text)">Spanish</strong> — se recuerda para siempre</span> · Usá ⛶ para pantalla completa</p>
+    <p class="player-note" id="player-note-base">🎬 StreamIMDb · Usá ⛶ para pantalla completa</p>
+    <div id="sub-tip-bar" style="display:none;background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.25);border-radius:8px;margin:4px 24px 8px;padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)">
+      <span>💬 <strong style="color:var(--text)">Subtítulos en español:</strong> apretá el ícono <strong style="color:var(--text)">CC</strong> dentro del reproductor → elegí <strong style="color:var(--text)">Spanish</strong>. Se guarda para siempre.</span>
+      <button onclick="closeSubTip()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0">Entendido ✓</button>
+    </div>
     <div class="provider-bar" id="provider-bar"><span class="provider-label">🖥️ Servidor:</span></div>
 
     <!-- TV Selectors -->
@@ -923,9 +927,11 @@ async function openModal(item) {
   updateFavBtn(item);
 
   document.getElementById("modal-overlay").classList.add("open");
-  // Mostrar/ocultar tip de subtítulos
-  const subTip = document.getElementById("sub-tip");
-  if(subTip) subTip.style.display = localStorage.getItem("viciotv_sub_tip_seen") ? "none" : "";
+  // Mostrar tip de subtítulos si no fue cerrado antes
+  const subTipBar = document.getElementById("sub-tip-bar");
+  if(subTipBar){
+    subTipBar.style.display = localStorage.getItem("viciotv_sub_tip_seen") ? "none" : "flex";
+  }
   document.body.style.overflow = "hidden";
   history.pushState({ modal: true }, "");
 
@@ -1154,6 +1160,12 @@ document.getElementById("play-next-btn").addEventListener("click", () => {
 
 /* ─── CERRAR MODAL ─── */
 const movieFrame = document.getElementById("movie-frame");
+function closeSubTip() {
+  localStorage.setItem("viciotv_sub_tip_seen", "1");
+  const bar = document.getElementById("sub-tip-bar");
+  if(bar) bar.style.display = "none";
+}
+
 function closeModal() {
   if (document.getElementById("modal").classList.contains("forced-fullscreen")) { history.back(); return; }
   _doCloseModal();
@@ -1162,7 +1174,9 @@ function _doCloseModal() {
   document.getElementById("modal-overlay").classList.remove("open");
   document.getElementById("modal").classList.remove("forced-fullscreen");
   document.getElementById("fs-btn").textContent = "⛶";
-  movieFrame.src = "";
+  // about:blank detiene el audio/video inmediatamente
+  movieFrame.src = "about:blank";
+  setTimeout(() => { movieFrame.src = ""; }, 100);
   document.body.style.overflow = "";
   clearTimeout(nextEpisodeTimer);
   history.replaceState(null, "", window.location.pathname + window.location.search);
@@ -1847,7 +1861,13 @@ document.addEventListener("keydown", e => {
   }
 });
 
+// Limpiar flag viejo si existía
+localStorage.removeItem("viciotv_sub_tip_seen_old");
+
 // ─── ARRANQUE ───
+// Limpiar flag viejo para que el tip de subtítulos vuelva a mostrarse
+// (quitar esta línea después de que todos los usuarios lo vean)
+localStorage.removeItem("viciotv_sub_tip_seen");
 initApp();
 </script>
 </body>
