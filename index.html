@@ -590,7 +590,7 @@ const PROVIDERS = [
     sandbox:"allow-scripts allow-same-origin allow-presentation allow-forms allow-top-navigation-by-user-activation" },
 
   { id:"embedmaster",
-    name:"EmbedMaster", flag:"⭐", note:"Multi-calidad · HD", hidden:true,
+    name:"EmbedMaster", flag:"⭐", note:"Multi-calidad · HD",
     movie:(t,i)=>i?`https://embedmaster.link/movie/${i}`:null,
     tv:(t,i,s,e)=>i?`https://embedmaster.link/tv/${i}/${s}/${e}`:null,
     sandbox:null },
@@ -600,6 +600,12 @@ const PROVIDERS = [
     movie:(t)=>`https://vidsrc.fyi/embed/movie/${t}`,
     tv:(t,i,s,e)=>`https://vidsrc.fyi/embed/tv/${t}/${s}/${e}`,
     sandbox:"allow-scripts allow-same-origin allow-presentation allow-forms allow-top-navigation-by-user-activation" },
+
+  { id:"embedapi",
+    name:"EmbedAPI", flag:"🌐", note:"10+ fuentes · Latino · Probar", hidden:true,
+    movie:(t)=>`https://player.embed-api.stream/?id=${t}`,
+    tv:(t,i,s,e)=>`https://player.embed-api.stream/?id=${t}&s=${s}&e=${e}&type=tv`,
+    sandbox:"allow-scripts allow-same-origin allow-presentation allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation" },
 ];
 let activeProvider = localStorage.getItem("viciotv_provider") || "streamimdb";
 function getProvider(){ return PROVIDERS.find(p=>p.id===activeProvider)||PROVIDERS[0]; }
