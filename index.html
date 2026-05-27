@@ -19,24 +19,74 @@
   ::-webkit-scrollbar{width:4px;height:4px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
 
   /* ===== PROFILE SCREEN ===== */
-  #profiles-screen{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px}
-  .profiles-logo{font-family:'Bebas Neue',cursive;font-size:42px;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .profiles-title{font-size:32px;font-weight:400;color:var(--text);text-align:center}
-  .profiles-grid{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;max-width:700px}
-  .profile-item{display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer}
-  .profile-avatar{width:120px;height:120px;border-radius:12px;border:3px solid transparent;transition:all .2s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  /* ── PROFILES SCREEN ── */
+  #profiles-screen{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;overflow:hidden}
+  /* Fondo animado */
+  #profiles-screen::before{content:'';position:absolute;inset:-50%;background:
+    radial-gradient(ellipse at 20% 50%,rgba(229,9,20,.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.1) 0%,transparent 50%),
+    radial-gradient(ellipse at 60% 80%,rgba(6,182,212,.08) 0%,transparent 50%);
+    animation:profiles-bg 12s ease-in-out infinite alternate;pointer-events:none}
+  @keyframes profiles-bg{0%{transform:scale(1) rotate(0deg)}100%{transform:scale(1.1) rotate(3deg)}}
+  .profiles-logo{font-family:'Bebas Neue',cursive;font-size:72px;letter-spacing:8px;
+    background:linear-gradient(90deg,var(--accent),#ff6b35,#fff,#ff6b35,var(--accent));
+    background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    animation:logo-shimmer 4s linear infinite;
+    filter:drop-shadow(0 0 30px rgba(229,9,20,.4));
+    line-height:1;margin-bottom:-8px}
+  .profiles-subtitle{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:-4px}
+  .profiles-title{font-size:26px;font-weight:300;color:rgba(255,255,255,.8);text-align:center;letter-spacing:1px}
+  .profiles-grid{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:720px;position:relative;z-index:1}
+  .profile-item{display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;position:relative}
+  .profile-avatar{width:110px;height:110px;border-radius:16px;border:3px solid rgba(255,255,255,.1);transition:all .25s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
   .profile-avatar img{width:100%;height:100%;object-fit:cover}
-  .profile-item:hover .profile-avatar{border-color:var(--text);transform:scale(1.05)}
-  .profile-name{font-size:15px;color:var(--text2);transition:color .2s}
-  .profile-item:hover .profile-name{color:var(--text)}
-  .profile-delete{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;display:none;align-items:center;justify-content:center;cursor:pointer;z-index:2}
-  .profile-item:hover .profile-delete{display:flex}
-  .profile-delete:hover{background:var(--accent)}
-  .profile-add .profile-avatar{background:var(--bg3);border:3px dashed var(--bg3);color:var(--text3);font-size:40px}
-  .profile-add:hover .profile-avatar{border-color:var(--text2);color:var(--text)}
-  .profile-add .profile-name{color:var(--text3)}
-  #profiles-edit-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text2);padding:8px 20px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
-  #profiles-edit-btn:hover{border-color:var(--text);color:var(--text)}
+  .profile-item:hover .profile-avatar{border-color:var(--accent);transform:scale(1.08) translateY(-4px);box-shadow:0 12px 40px rgba(229,9,20,.3)}
+  .profile-name{font-size:14px;color:rgba(255,255,255,.7);transition:color .2s;font-weight:500}
+  .profile-item:hover .profile-name{color:#fff}
+  /* Edit overlay sobre avatar - solo visible en modo edición */
+  .profile-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:22px;cursor:pointer;pointer-events:none}
+  .edit-mode .profile-item:hover .profile-edit-overlay{opacity:1;pointer-events:auto}
+  .profile-add .profile-avatar{border:3px dashed rgba(255,255,255,.15);color:rgba(255,255,255,.3);font-size:36px}
+  .profile-add:hover .profile-avatar{border-color:rgba(255,255,255,.5);color:rgba(255,255,255,.7)}
+  .profile-add .profile-name{color:rgba(255,255,255,.4)}
+  #profiles-edit-btn{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:8px 24px;border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;position:relative;z-index:1}
+  #profiles-edit-btn:hover{border-color:rgba(255,255,255,.4);color:#fff}
+
+  /* ── PROFILE EDITOR MODAL ── */
+  #profile-editor-modal{display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+  #profile-editor-modal.open{display:flex}
+  .profile-editor-box{background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;width:90vw;max-width:520px;animation:modalIn .25s ease;display:flex;flex-direction:column;gap:20px}
+  .pe-header{display:flex;align-items:center;gap:16px}
+  .pe-avatar-btn{width:80px;height:80px;border-radius:14px;border:3px solid rgba(255,255,255,.15);overflow:hidden;cursor:pointer;flex-shrink:0;position:relative;transition:border-color .2s}
+  .pe-avatar-btn:hover{border-color:var(--accent)}
+  .pe-avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}
+  .pe-avatar-btn .pe-av-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px}
+  .pe-avatar-btn:hover .pe-av-overlay{opacity:1}
+  .pe-header-info{flex:1;display:flex;flex-direction:column;gap:8px}
+  .pe-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text)}
+  .pe-name-input{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 16px;color:#fff;font-family:'Outfit',sans-serif;font-size:15px;outline:none;transition:border-color .2s;width:100%}
+  .pe-name-input:focus{border-color:var(--accent)}
+  .pe-name-input::placeholder{color:var(--text3)}
+  /* Avatar picker */
+  .pe-av-picker-title{font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+  .pe-av-categories{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+  .pe-av-cat-btn{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--text2);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
+  .pe-av-cat-btn:hover,.pe-av-cat-btn.active{background:rgba(229,9,20,.15);color:var(--accent);border-color:rgba(229,9,20,.3)}
+  .pe-av-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
+  .pe-av-grid::-webkit-scrollbar{width:4px}
+  .pe-av-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
+  .pe-av-item{width:56px;height:56px;border-radius:12px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:all .2s}
+  .pe-av-item:hover{transform:scale(1.1);border-color:rgba(255,255,255,.4)}
+  .pe-av-item.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(229,9,20,.3)}
+  .pe-av-item img{width:100%;height:100%;object-fit:cover;display:block}
+  /* Botones */
+  .pe-actions{display:flex;gap:10px}
+  .pe-btn-cancel{flex:1;background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--text2);border-radius:10px;padding:12px;font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+  .pe-btn-cancel:hover{border-color:rgba(255,255,255,.3);color:#fff}
+  .pe-btn-save{flex:2;background:var(--accent);border:none;color:#fff;border-radius:10px;padding:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+  .pe-btn-save:hover{background:#c00712}
+  .pe-btn-delete{background:transparent;border:1px solid rgba(255,60,60,.3);color:rgba(255,100,100,.8);border-radius:10px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+  .pe-btn-delete:hover{background:rgba(255,60,60,.1)}
 
   /* Crear perfil modal */
   #create-profile-modal{display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.85);align-items:center;justify-content:center}
@@ -397,20 +447,34 @@
 <!-- ===== PANTALLA DE PERFILES ===== -->
 <div id="profiles-screen">
   <div class="profiles-logo">VicioTV</div>
+  <p class="profiles-subtitle">Streaming · Películas · Series · Anime</p>
   <h2 class="profiles-title">¿Quién está viendo?</h2>
   <div class="profiles-grid" id="profiles-grid"></div>
   <button id="profiles-edit-btn" onclick="toggleProfileEdit()">Editar perfiles</button>
 </div>
 
-<!-- ===== MODAL CREAR PERFIL ===== -->
-<div id="create-profile-modal">
-  <div class="create-box">
-    <h2 id="create-modal-title">Nuevo Perfil</h2>
-    <div class="emoji-picker" id="emoji-picker"></div>
-    <input class="create-input focusable" id="profile-name-input" type="text" placeholder="Nombre del perfil..." maxlength="20" />
-    <div class="create-btns">
-      <button class="btn-cancel focusable" onclick="closeCreateProfile()">Cancelar</button>
-      <button class="btn-create focusable" onclick="confirmCreateProfile()">Guardar</button>
+<!-- ===== PROFILE EDITOR MODAL ===== -->
+<div id="profile-editor-modal">
+  <div class="profile-editor-box">
+    <div class="pe-header">
+      <div class="pe-avatar-btn" id="pe-avatar-btn">
+        <img id="pe-avatar-img" src="" alt="Avatar">
+        <div class="pe-av-overlay">✏️</div>
+      </div>
+      <div class="pe-header-info">
+        <div class="pe-title" id="pe-modal-title">Nuevo perfil</div>
+        <input class="pe-name-input" id="pe-name-input" type="text" placeholder="Nombre del perfil..." maxlength="24" autocomplete="off">
+      </div>
+    </div>
+    <div>
+      <div class="pe-av-picker-title" style="margin-bottom:10px">Elegí tu avatar · Scrolleá para ver más</div>
+      <div class="pe-av-categories" id="pe-av-categories" style="display:none"></div>
+      <div class="pe-av-grid" id="pe-av-grid"></div>
+    </div>
+    <div class="pe-actions">
+      <button class="pe-btn-delete" id="pe-btn-delete" style="display:none" onclick="deleteCurrentProfile()">🗑</button>
+      <button class="pe-btn-cancel" onclick="closeProfileEditor()">Cancelar</button>
+      <button class="pe-btn-save" onclick="saveProfileEditor()">Guardar</button>
     </div>
   </div>
 </div>
@@ -1992,119 +2056,292 @@ window.addEventListener("scroll", () => {
   document.getElementById("nav").classList.toggle("scrolled", window.scrollY > 50);
 });
 
-/* ─── PERFILES (pantalla inicial) ─── */
-const EMOJIS = ["😎","🎬","🍿","👑","🦁","🐺","🦊","🐱","🎭","🎮","🚀","🌙","⚡","🔥","💎","🎯"];
-let selectedEmoji = EMOJIS[0];
-let editingProfile = null;
+/* ═══════════════════════════════════════
+   PERFILES — sistema completo
+═══════════════════════════════════════ */
+
+/* Avatares: dicebear con variedad de estilos */
+// Todos los avatares mezclados — se cargan de a 20 con scroll infinito
+const ALL_AVATARS = [
+  // Personajes masculinos
+  {seed:"Carlos",    style:"adventurer"},{seed:"Miguel",     style:"adventurer"},
+  {seed:"Diego",     style:"adventurer"},{seed:"Lucas",      style:"adventurer"},
+  {seed:"Mateo",     style:"adventurer"},{seed:"Thiago",     style:"adventurer"},
+  {seed:"Rodrigo",   style:"adventurer"},{seed:"Facundo",    style:"adventurer"},
+  {seed:"Ezequiel",  style:"adventurer"},{seed:"Santiago",   style:"adventurer"},
+  {seed:"Bruno",     style:"adventurer"},{seed:"Valentín",   style:"adventurer"},
+  {seed:"Tomás",     style:"adventurer"},{seed:"Ramiro",     style:"adventurer"},
+  {seed:"Alejandro", style:"adventurer"},{seed:"Fernando",   style:"adventurer"},
+  // Personajes femeninos
+  {seed:"Valentina", style:"adventurer-neutral"},{seed:"Camila",  style:"adventurer-neutral"},
+  {seed:"Martina",   style:"adventurer-neutral"},{seed:"Luciana", style:"adventurer-neutral"},
+  {seed:"Florencia", style:"adventurer-neutral"},{seed:"Sofía",   style:"adventurer-neutral"},
+  {seed:"Isabella",  style:"adventurer-neutral"},{seed:"Catalina",style:"adventurer-neutral"},
+  {seed:"Antonella", style:"adventurer-neutral"},{seed:"Bianca",  style:"adventurer-neutral"},
+  {seed:"Rocío",     style:"adventurer-neutral"},{seed:"Julieta", style:"adventurer-neutral"},
+  {seed:"Natalia",   style:"adventurer-neutral"},{seed:"Paula",   style:"adventurer-neutral"},
+  {seed:"Celeste",   style:"adventurer-neutral"},{seed:"Renata",  style:"adventurer-neutral"},
+  // Emojis / Animales con personalidad
+  {seed:"Zorro-Cool",     style:"fun-emoji"},{seed:"Gato-Lentes",    style:"fun-emoji"},
+  {seed:"Lobo-Sombrero",  style:"fun-emoji"},{seed:"Oso-Chill",      style:"fun-emoji"},
+  {seed:"Panda-Pro",      style:"fun-emoji"},{seed:"Sapo-Vibes",     style:"fun-emoji"},
+  {seed:"Conejo-Swag",    style:"fun-emoji"},{seed:"Tigre-King",     style:"fun-emoji"},
+  {seed:"Búho-Master",    style:"fun-emoji"},{seed:"León-Boss",      style:"fun-emoji"},
+  {seed:"Perro-Gamer",    style:"fun-emoji"},{seed:"Dragón-Fire",    style:"fun-emoji"},
+  {seed:"Delfín-Wave",    style:"fun-emoji"},{seed:"Ballena-Blue",   style:"fun-emoji"},
+  {seed:"Pájaro-Fly",     style:"fun-emoji"},{seed:"Mono-Fun",       style:"fun-emoji"},
+  {seed:"Koala-Sleep",    style:"fun-emoji"},{seed:"Pingüino-Cool",  style:"fun-emoji"},
+  {seed:"Cocodrilo-Swag", style:"fun-emoji"},{seed:"Camaleón-Mix",   style:"fun-emoji"},
+  {seed:"Pulpo-8arms",    style:"fun-emoji"},{seed:"Tiburón-Sharp",  style:"fun-emoji"},
+  {seed:"Unicornio-Magic",style:"fun-emoji"},{seed:"Rana-Jump",      style:"fun-emoji"},
+  {seed:"Mapache-Trash",  style:"fun-emoji"},{seed:"Capibara-Chill", style:"fun-emoji"},
+  {seed:"Nutria-Water",   style:"fun-emoji"},{seed:"Axolotl-Pink",   style:"fun-emoji"},
+  // Pixel Art
+  {seed:"PixelHero",    style:"pixel-art"},{seed:"PixelNinja",   style:"pixel-art"},
+  {seed:"PixelWizard",  style:"pixel-art"},{seed:"PixelKnight",  style:"pixel-art"},
+  {seed:"PixelRogue",   style:"pixel-art"},{seed:"PixelMage",    style:"pixel-art"},
+  {seed:"PixelArcher",  style:"pixel-art"},{seed:"PixelSamurai", style:"pixel-art"},
+  {seed:"PixelViking",  style:"pixel-art"},{seed:"PixelPirate",  style:"pixel-art"},
+  {seed:"PixelKing",    style:"pixel-art"},{seed:"PixelQueen",   style:"pixel-art"},
+  {seed:"PixelDruid",   style:"pixel-art"},{seed:"PixelBard",    style:"pixel-art"},
+  {seed:"PixelMonk",    style:"pixel-art"},{seed:"PixelRanger",  style:"pixel-art"},
+  // Cartoon
+  {seed:"Sunny-Face",   style:"big-smile"},{seed:"Happy-Vibes",  style:"big-smile"},
+  {seed:"Cool-Dude",    style:"big-smile"},{seed:"Chill-Mode",   style:"big-smile"},
+  {seed:"Party-Time",   style:"big-smile"},{seed:"Smile-King",   style:"big-smile"},
+  {seed:"Glow-Up",      style:"big-smile"},{seed:"Vibe-Check",   style:"big-smile"},
+  {seed:"Cosmic-Soul",  style:"big-smile"},{seed:"Dream-Big",    style:"big-smile"},
+  {seed:"Star-Power",   style:"big-smile"},{seed:"Moon-Child",   style:"big-smile"},
+  {seed:"Wave-Rider",   style:"big-smile"},{seed:"Sky-High",     style:"big-smile"},
+  {seed:"Deep-Blue",    style:"big-smile"},{seed:"Fire-Soul",    style:"big-smile"},
+  // Robots
+  {seed:"RoboAlpha",   style:"bottts"},{seed:"RoboBeta",    style:"bottts"},
+  {seed:"RoboGamma",   style:"bottts"},{seed:"RoboDelta",   style:"bottts"},
+  {seed:"RoboEpsilon", style:"bottts"},{seed:"RoboZeta",    style:"bottts"},
+  {seed:"RoboEta",     style:"bottts"},{seed:"RoboTheta",   style:"bottts"},
+  {seed:"RoboIota",    style:"bottts"},{seed:"RoboKappa",   style:"bottts"},
+  {seed:"RoboLambda",  style:"bottts"},{seed:"RoboMu",      style:"bottts"},
+  {seed:"RoboNu",      style:"bottts"},{seed:"RoboXi",      style:"bottts"},
+  {seed:"RoboOmicron", style:"bottts"},{seed:"RoboPi",      style:"bottts"},
+];
+// Mezclar para que queden intercalados (Fisher-Yates)
+(function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}})(ALL_AVATARS);
+
+const BG_COLORS = ["b6e3f4","c0aede","d1d4f9","ffd5dc","ffdfbf","f4d150","aefef4","c3f4c8"];
+
+function getAvatarUrl(style, seed) {
+  const bg = BG_COLORS[Math.abs(seed.split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % BG_COLORS.length];
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg}`;
+}
+
+let _editingProfileIdx = null;
+let _pendingAvatarUrl  = null;
 
 function renderProfiles() {
   const profiles = getProfiles();
   const grid = document.getElementById("profiles-grid");
   grid.innerHTML = "";
+
   profiles.forEach((p, idx) => {
     const item = document.createElement("div");
     item.className = "profile-item";
-    const avatarContent = p.img
-      ? `<img src="${p.img}" alt="${p.name}">`
-      : `<span style="font-size:48px">${p.emoji || "😎"}</span>`;
+    const avatarUrl = p.avatar || getAvatarUrl("adventurer", p.name || "User");
     item.innerHTML = `
-      <div class="profile-avatar" style="background:${p.color||"#1a1a26"}">
-        ${avatarContent}
-        <div class="profile-delete" title="Eliminar">✕</div>
+      <div class="profile-avatar">
+        <img src="${avatarUrl}" alt="${p.name}">
+        <div class="profile-edit-overlay">✏️</div>
       </div>
       <span class="profile-name">${p.name}</span>`;
-    item.querySelector(".profile-delete").addEventListener("click", e => {
+    // Click en overlay de edición — SOLO editar
+    item.querySelector(".profile-edit-overlay").addEventListener("click", e => {
       e.stopPropagation();
-      if (!profileEditMode) return;
-      if (confirm(`¿Eliminar perfil "${p.name}"?`)) {
-        ["viciotv_favs","viciotv_continue_watching","viciotv_progress"].forEach(k =>
-          localStorage.removeItem(`${k}__${p.name}`));
-        const profs = getProfiles();
-        profs.splice(idx, 1);
-        saveProfiles(profs);
-        if (sessionStorage.getItem("viciotv_current_profile") === p.name)
-          sessionStorage.removeItem("viciotv_current_profile");
-        renderProfiles();
-      }
+      e.preventDefault();
+      openProfileEditor(idx);
     });
-    item.addEventListener("click", () => {
-      if (profileEditMode) return;
-      sessionStorage.setItem("viciotv_current_profile", p.name);
-      document.getElementById("profiles-screen").style.display = "none";
-      document.getElementById("nav").style.display   = "";
-      document.getElementById("hero").style.display  = "";
-      document.getElementById("main").style.display  = "";
-      updateNavProfile(p);
-      renderFavs();
-      renderContinueWatching();
-      initContent();
+    // Click en item — seleccionar siempre que no sea modo edición
+    item.addEventListener("click", e => {
+      if (e.target.closest(".profile-edit-overlay")) return; // ya lo maneja overlay
+      if (profileEditMode) { openProfileEditor(idx); return; }
+      selectProfile(p);
     });
     grid.appendChild(item);
   });
-  // Agregar perfil
-  const add = document.createElement("div");
-  add.className = "profile-item profile-add";
-  add.innerHTML = `<div class="profile-avatar"><span>+</span></div><span class="profile-name">Agregar perfil</span>`;
-  add.addEventListener("click", () => openCreateProfile(null));
-  grid.appendChild(add);
+  // Botón agregar — siempre visible
+  if (profiles.length < 6) { // máximo 6 perfiles
+    const add = document.createElement("div");
+    add.className = "profile-item profile-add";
+    add.innerHTML = `<div class="profile-avatar" style="font-size:36px;color:rgba(255,255,255,.3)">＋</div><span class="profile-name">Agregar perfil</span>`;
+    add.addEventListener("click", () => openProfileEditor(null));
+    grid.appendChild(add);
+  }
+
 }
+
+function selectProfile(p) {
+  sessionStorage.setItem("viciotv_current_profile", p.name);
+  document.getElementById("profiles-screen").style.display = "none";
+  document.getElementById("nav").style.display   = "flex";
+  document.getElementById("hero").style.display  = "block";
+  document.getElementById("main").style.display  = "block";
+  updateNavProfile(p);
+  renderFavs();
+  renderContinueWatching();
+  initContent();
+}
+
 function toggleProfileEdit() {
   profileEditMode = !profileEditMode;
   document.getElementById("profiles-edit-btn").textContent = profileEditMode ? "Listo" : "Editar perfiles";
-  document.querySelectorAll(".profile-delete").forEach(d => {
-    d.style.display = profileEditMode ? "flex" : "";
-  });
+  document.getElementById("profiles-grid").classList.toggle("edit-mode", profileEditMode);
 }
+
 function updateNavProfile(p) {
   const avatarEl = document.getElementById("nav-avatar");
   const nameEl   = document.getElementById("nav-name");
-  if (p.img) avatarEl.innerHTML = `<img src="${p.img}" alt="${p.name}">`;
-  else avatarEl.innerHTML = `<span style="font-size:18px">${p.emoji||"😎"}</span>`;
+  const url = p.avatar || getAvatarUrl("adventurer", p.name || "User");
+  avatarEl.innerHTML = `<img src="${url}" alt="${p.name}">`;
   nameEl.textContent = p.name;
 }
+
 function goToProfiles() {
   profileEditMode = false;
   document.getElementById("profiles-edit-btn").textContent = "Editar perfiles";
   document.getElementById("profiles-screen").style.display = "flex";
 }
-function openCreateProfile(p) {
-  editingProfile = p;
-  selectedEmoji = p?.emoji || EMOJIS[0];
-  document.getElementById("create-modal-title").textContent = p ? "Editar perfil" : "Nuevo Perfil";
-  document.getElementById("profile-name-input").value = p?.name || "";
-  const picker = document.getElementById("emoji-picker");
-  picker.innerHTML = "";
-  EMOJIS.forEach(em => {
-    const opt = document.createElement("div");
-    opt.className = "emoji-opt" + (em === selectedEmoji ? " selected" : "");
-    opt.textContent = em;
-    opt.addEventListener("click", () => {
-      selectedEmoji = em;
-      picker.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("selected"));
-      opt.classList.add("selected");
-    });
-    picker.appendChild(opt);
-  });
-  document.getElementById("create-profile-modal").classList.add("open");
-  document.getElementById("profile-name-input").focus();
-}
-function closeCreateProfile() {
-  document.getElementById("create-profile-modal").classList.remove("open");
-}
-function confirmCreateProfile() {
-  const name = document.getElementById("profile-name-input").value.trim();
-  if (!name) return;
-  const colors = ["#1a0a2e","#0a1a2e","#0a2e0a","#2e1a0a","#2e0a0a","#0a2e2e"];
-  const color  = colors[Math.floor(Math.random() * colors.length)];
+
+/* ── Editor de perfil ── */
+function openProfileEditor(idx) {
+  _editingProfileIdx = idx;
+  _pendingAvatarUrl  = null;
+  const modal = document.getElementById("profile-editor-modal");
   const profiles = getProfiles();
-  const existing = profiles.findIndex(p => p.name === editingProfile?.name);
-  if (existing >= 0) profiles[existing] = { ...profiles[existing], name, emoji: selectedEmoji };
-  else profiles.push({ name, emoji: selectedEmoji, color });
+
+  if (idx !== null && profiles[idx]) {
+    const p = profiles[idx];
+    document.getElementById("pe-modal-title").textContent = "Editar perfil";
+    document.getElementById("pe-name-input").value = p.name || "";
+    document.getElementById("pe-avatar-img").src = p.avatar || getAvatarUrl("adventurer", p.name);
+    document.getElementById("pe-btn-delete").style.display = "inline-block";
+  } else {
+    document.getElementById("pe-modal-title").textContent = "Nuevo perfil";
+    document.getElementById("pe-name-input").value = "";
+    // Avatar random por defecto
+    const randAv = ALL_AVATARS[Math.floor(Math.random() * ALL_AVATARS.length)];
+    _pendingAvatarUrl = getAvatarUrl(randAv.style, randAv.seed);
+    document.getElementById("pe-avatar-img").src = _pendingAvatarUrl;
+    document.getElementById("pe-btn-delete").style.display = "none";
+  }
+
+  buildAvatarPicker();
+  modal.classList.add("open");
+  document.getElementById("pe-name-input").focus();
+}
+
+function closeProfileEditor() {
+  document.getElementById("profile-editor-modal").classList.remove("open");
+}
+
+function saveProfileEditor() {
+  const name = document.getElementById("pe-name-input").value.trim();
+  if (!name) { document.getElementById("pe-name-input").focus(); return; }
+  const avatar = _pendingAvatarUrl || document.getElementById("pe-avatar-img").src;
+  const profiles = getProfiles();
+  if (_editingProfileIdx !== null && profiles[_editingProfileIdx]) {
+    const old = profiles[_editingProfileIdx];
+    const oldName = old.name;
+    profiles[_editingProfileIdx] = { ...old, name, avatar };
+    // Si cambió el nombre, actualizar la sesión activa
+    if (oldName !== name && sessionStorage.getItem("viciotv_current_profile") === oldName) {
+      sessionStorage.setItem("viciotv_current_profile", name);
+    }
+  } else {
+    profiles.push({ name, avatar });
+  }
   saveProfiles(profiles);
   renderProfiles();
-  closeCreateProfile();
+  closeProfileEditor();
+  // Actualizar nav si es el perfil activo
+  const active = sessionStorage.getItem("viciotv_current_profile");
+  const activeP = profiles.find(p => p.name === active);
+  if (activeP) updateNavProfile(activeP);
 }
-document.getElementById("profile-name-input").addEventListener("keydown", e => { if (e.key === "Enter") confirmCreateProfile(); });
+
+function deleteCurrentProfile() {
+  if (_editingProfileIdx === null) return;
+  const profiles = getProfiles();
+  const target = profiles[_editingProfileIdx];
+  if (!target) return;
+  if (!confirm(`¿Eliminar "${target.name}"? Se borrarán sus favoritos y progreso.`)) return;
+  ["viciotv_favs","viciotv_continue_watching","viciotv_progress"].forEach(k =>
+    localStorage.removeItem(`${k}__${target.name}`));
+  profiles.splice(_editingProfileIdx, 1);
+  saveProfiles(profiles);
+  if (sessionStorage.getItem("viciotv_current_profile") === target.name)
+    sessionStorage.removeItem("viciotv_current_profile");
+  renderProfiles();
+  closeProfileEditor();
+}
+
+/* ── Avatar Picker con scroll infinito ── */
+let _avPage = 0;
+const AV_PAGE_SIZE = 20;
+let _avObserver = null;
+
+function buildAvatarPicker() {
+  // Ocultar categorías (ya no las necesitamos)
+  const catsEl = document.getElementById("pe-av-categories");
+  if (catsEl) catsEl.innerHTML = "";
+  _avPage = 0;
+  const grid = document.getElementById("pe-av-grid");
+  grid.innerHTML = "";
+  // Sentinel para scroll infinito
+  const sentinel = document.createElement("div");
+  sentinel.id = "av-sentinel";
+  sentinel.style.height = "10px";
+  grid.appendChild(sentinel);
+  // Cargar primera página
+  loadAvatarPage();
+  // Observer para scroll infinito
+  if (_avObserver) _avObserver.disconnect();
+  _avObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) loadAvatarPage();
+  }, { root: grid, rootMargin: "60px", threshold: 0 });
+  _avObserver.observe(sentinel);
+}
+
+function loadAvatarPage() {
+  const start = _avPage * AV_PAGE_SIZE;
+  const end   = start + AV_PAGE_SIZE;
+  if (start >= ALL_AVATARS.length) return;
+  const grid    = document.getElementById("pe-av-grid");
+  const sentinel= document.getElementById("av-sentinel");
+  const currentUrl = _pendingAvatarUrl || document.getElementById("pe-avatar-img").src;
+  ALL_AVATARS.slice(start, end).forEach(av => {
+    const url  = getAvatarUrl(av.style, av.seed);
+    const item = document.createElement("div");
+    item.className = "pe-av-item" + (url === currentUrl ? " selected" : "");
+    item.dataset.url = url;
+    item.innerHTML = `<img src="${url}" alt="${av.seed}" loading="lazy">`;
+    item.addEventListener("click", () => {
+      _pendingAvatarUrl = url;
+      document.getElementById("pe-avatar-img").src = url;
+      grid.querySelectorAll(".pe-av-item").forEach(i => i.classList.remove("selected"));
+      item.classList.add("selected");
+    });
+    grid.insertBefore(item, sentinel);
+  });
+  _avPage++;
+}
+
+function renderAvatarGrid() { buildAvatarPicker(); }
+
+document.getElementById("pe-avatar-btn").addEventListener("click", () => {
+  const grid = document.getElementById("pe-av-grid");
+  grid.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+document.getElementById("pe-name-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") saveProfileEditor();
+});
 
 /* ─── DEEP LINK ─── */
 async function handleDeepLink() {
