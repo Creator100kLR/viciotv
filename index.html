@@ -1644,9 +1644,9 @@ function switchTab(tab) {
 
   // Continuar viendo y favoritos siempre visibles en inicio
   if (tab === "inicio") {
-    document.getElementById("hero").style.display = "";
+    document.getElementById("hero").style.display = "block";
     ["section-favs","viciotv-cw-container","sec-popular","sec-nowplaying","sec-tvtrending"].forEach(id => {
-      const el = document.getElementById(id); if (el) el.style.display = "";
+      const el = document.getElementById(id); if (el) el.style.display = "block";
     });
     renderContinueWatching(); renderFavs();
   } else if (tab === "peliculas") {
