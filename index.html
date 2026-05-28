@@ -57,6 +57,15 @@
 
   /* ── PROFILE EDITOR MODAL ── */
   #profile-editor-modal{display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+  .pe-confirm{display:none;position:absolute;inset:0;z-index:10;background:rgba(0,0,0,.85);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center}
+  .pe-confirm.open{display:flex}
+  .pe-confirm-text{font-size:15px;color:var(--text2);line-height:1.6}
+  .pe-confirm-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .pe-confirm-btns{display:flex;gap:12px;margin-top:8px}
+  .pe-confirm-yes{background:rgba(255,40,40,.15);border:1px solid rgba(255,60,60,.4);color:rgba(255,100,100,.9);padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;transition:all .2s}
+  .pe-confirm-yes:hover{background:rgba(255,40,40,.3)}
+  .pe-confirm-no{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text2);padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;transition:all .2s}
+  .pe-confirm-no:hover{background:rgba(255,255,255,.1)}
   #profile-editor-modal.open{display:flex}
   .profile-editor-box{background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;width:90vw;max-width:520px;animation:modalIn .25s ease;display:flex;flex-direction:column;gap:20px}
   .pe-header{display:flex;align-items:center;gap:16px}
@@ -626,9 +635,18 @@
       <div class="pe-av-grid" id="pe-av-grid"></div>
     </div>
     <div class="pe-actions">
-      <button class="pe-btn-delete" id="pe-btn-delete" style="display:none" onclick="deleteCurrentProfile()">🗑</button>
+      <button class="pe-btn-delete" id="pe-btn-delete" style="display:none" onclick="showDeleteConfirm()">🗑</button>
       <button class="pe-btn-cancel" onclick="closeProfileEditor()">Cancelar</button>
       <button class="pe-btn-save" onclick="saveProfileEditor()">Guardar</button>
+    </div>
+    <!-- Confirm eliminar -->
+    <div class="pe-confirm" id="pe-confirm">
+      <div class="pe-confirm-name" id="pe-confirm-name"></div>
+      <div class="pe-confirm-text">¿Eliminar este perfil?<br>Se borrarán sus favoritos y progreso.</div>
+      <div class="pe-confirm-btns">
+        <button class="pe-confirm-no" onclick="hideDeleteConfirm()">Cancelar</button>
+        <button class="pe-confirm-yes" onclick="deleteCurrentProfile()">Eliminar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2657,20 +2675,30 @@ function saveProfileEditor() {
   if (activeP) updateNavProfile(activeP);
 }
 
+function showDeleteConfirm() {
+  const profiles = getProfiles();
+  const target = profiles[_editingProfileIdx];
+  if (!target) return;
+  document.getElementById("pe-confirm-name").textContent = target.name;
+  document.getElementById("pe-confirm").classList.add("open");
+}
+function hideDeleteConfirm() {
+  document.getElementById("pe-confirm").classList.remove("open");
+}
 function deleteCurrentProfile() {
+  hideDeleteConfirm();
   if (_editingProfileIdx === null) return;
   const profiles = getProfiles();
   const target = profiles[_editingProfileIdx];
   if (!target) return;
-  if (!confirm(`¿Eliminar "${target.name}"? Se borrarán sus favoritos y progreso.`)) return;
   ["viciotv_favs","viciotv_continue_watching","viciotv_progress"].forEach(k =>
     localStorage.removeItem(`${k}__${target.name}`));
   profiles.splice(_editingProfileIdx, 1);
   saveProfiles(profiles);
   if (sessionStorage.getItem("viciotv_current_profile") === target.name)
     sessionStorage.removeItem("viciotv_current_profile");
-  renderProfiles();
   closeProfileEditor();
+  renderProfiles();
 }
 
 /* ── Avatar Picker con scroll infinito ── */
