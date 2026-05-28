@@ -250,11 +250,12 @@
   .row-header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;margin-bottom:24px;position:relative;gap:16px}
   .row-title{
     font-family:'Bebas Neue',cursive;
-    font-size:17px;
+    font-size:19px;
     letter-spacing:5px;
-    background:linear-gradient(90deg,#fff 60%,rgba(255,255,255,.4));
+    background:linear-gradient(90deg,#fff,#aaa,#fff,#888,#fff);
+    background-size:300% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    filter:drop-shadow(0 0 8px rgba(255,255,255,.15));
+    animation:title-shimmer 6s linear infinite;
     position:relative;
     display:flex;
     align-items:center;
@@ -262,7 +263,8 @@
     white-space:nowrap;
     flex-shrink:0;
   }
-  /* Punto titilando — con margen para no cortarse */
+  @keyframes title-shimmer{to{background-position:300% center}}
+  /* Punto — más margen para no cortarse */
   .row-title::before{
     content:'';
     width:7px;height:7px;
@@ -270,7 +272,7 @@
     background:var(--accent);
     flex-shrink:0;
     display:inline-block;
-    margin-left:4px;
+    margin-left:10px;
     -webkit-text-fill-color:initial;
     background-clip:unset;
     -webkit-background-clip:unset;
@@ -280,25 +282,27 @@
     0%,100%{box-shadow:0 0 3px var(--accent),0 0 6px var(--accent);opacity:1;transform:scale(1)}
     50%{box-shadow:0 0 6px var(--accent),0 0 12px var(--accent);opacity:.5;transform:scale(.75)}
   }
-  /* Línea efecto respirar — suave y con suspenso */
+  /* Línea — ola que viaja de izquierda a derecha */
   .row-header::after{
     content:'';
     flex:1;
     height:1px;
     border-radius:2px;
     background:linear-gradient(90deg,
-      var(--accent) 0%,
-      rgba(255,100,60,.5) 20%,
-      rgba(255,255,255,.08) 50%,
+      rgba(255,255,255,.04) 0%,
+      rgba(255,255,255,.04) 30%,
+      var(--accent) 45%,
+      rgba(255,140,80,.7) 50%,
+      var(--accent) 55%,
+      rgba(255,255,255,.04) 70%,
       rgba(255,255,255,.04) 100%
     );
-    animation:line-breathe 4s ease-in-out infinite;
+    background-size:250% 100%;
+    animation:wave-travel 4s ease-in-out infinite;
   }
-  @keyframes line-breathe{
-    0%,100%{opacity:.3;filter:blur(0px)}
-    40%{opacity:1;filter:blur(0px)}
-    50%{opacity:1;filter:blur(.5px) drop-shadow(0 0 3px var(--accent))}
-    60%{opacity:.9;filter:blur(0px)}
+  @keyframes wave-travel{
+    0%  {background-position:170% center}
+    100%{background-position:-70% center}
   }
   /* Carruseles horizontales — usados solo en Mi Lista, tabs de películas/series, etc */
   .cards-scroll{display:flex;gap:12px;padding:4px 32px 16px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory}
