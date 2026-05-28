@@ -2236,6 +2236,8 @@ function selectProfile(p) {
   renderFavs();
   renderContinueWatching();
   initContent();
+  // Contar visita por perfil — cada perfil tiene su propio cooldown de 2hs
+  registerVisit(p.name);
 }
 
 function toggleProfileEdit() {
@@ -2855,35 +2857,34 @@ initApp();
 initThemePicker();
 
 // ─── CONTADOR DE VISITAS ───
-(async function initVisitCounter() {
-  const COUNTER_KEY = "viciotv-visitas-v1"; // clave única en countapi
-  const COOLDOWN_MS = 2 * 60 * 60 * 1000;    // 2 horas
-  const API = `https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`;
+// Se llama desde selectProfile, con el perfil ya elegido
+async function registerVisit(profileName) {
+  const COUNTER_KEY = "viciotv-visitas-v1";
+  const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 horas por perfil
+  const STORAGE_KEY = `viciotv_last_visit__${profileName}`; // clave por perfil
+  const API     = `https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`;
   const API_GET = `https://countapi.mileshilliard.com/api/v1/get/${COUNTER_KEY}`;
   const el = document.getElementById("visit-count");
 
-  const lastVisit = parseInt(localStorage.getItem("viciotv_last_visit") || "0");
+  const lastVisit = parseInt(localStorage.getItem(STORAGE_KEY) || "0");
   const now = Date.now();
 
   try {
     let data;
     if (now - lastVisit > COOLDOWN_MS) {
-      // Registra visita Y devuelve el nuevo valor
-      localStorage.setItem("viciotv_last_visit", now);
+      localStorage.setItem(STORAGE_KEY, now);
       const res = await fetch(API);
       data = await res.json();
     } else {
-      // Solo consulta sin sumar
       const res = await fetch(API_GET);
       data = await res.json();
     }
     const value = data.value ?? data.count ?? null;
     if (el && value !== null) el.textContent = Number(value).toLocaleString("es");
   } catch {
-    // Si falla la API, no mostramos nada raro
     if (el) el.textContent = "—";
   }
-})();
+}
 </script>
 </body>
 </html>
