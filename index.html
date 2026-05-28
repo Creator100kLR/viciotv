@@ -1355,9 +1355,9 @@ function buildCard(m, i) {
     <div class="card-overlay">
       <span class="card-overlay-title">${title}</span>
       <span class="card-overlay-rating">★${rating}</span>
-      <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">▶ Trailer</button>
       <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
     </div>
+    <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">▶ Trailer</button>
     <button class="card-fav-btn card-fav-visible ${(function(){try{return isFav(m.id)?'is-fav':''}catch(e){return ''}}())}" data-id="${m.id}">
       <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
