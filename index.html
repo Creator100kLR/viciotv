@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>VicioTV</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e50914">
@@ -284,7 +284,6 @@
   .modal-topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 16px;background:var(--bg2);border-radius:16px 16px 0 0}
   .modal-topbar button{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
   .modal-topbar button:hover{background:var(--accent)}
-  #fs-btn{font-size:18px}
   .player-wrap{width:100%;aspect-ratio:16/9;background:#000;position:relative}
   .player-wrap iframe{width:100%;height:100%;border:none;display:block}
   #next-episode-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.82);z-index:5;align-items:center;justify-content:center}
@@ -403,8 +402,6 @@
   .cw-long-press-toast__cancel{background:transparent;color:var(--text3);border:1px solid rgba(255,255,255,.1);padding:6px 18px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer}
 
   /* Fullscreen forzado (fallback Android) */
-  #modal.forced-fullscreen{position:fixed;inset:0;border-radius:0;max-width:100%;max-height:100%;z-index:3000;overflow:hidden}
-  #modal.forced-fullscreen .player-wrap{aspect-ratio:unset;height:100vh}
   #modal.forced-fullscreen .modal-body,#modal.forced-fullscreen #episodes-panel,
   #modal.forced-fullscreen #modal-cast-section,#modal.forced-fullscreen #modal-similar-section,
   #modal.forced-fullscreen .player-note,#modal.forced-fullscreen #tv-selectors{display:none!important}
@@ -432,6 +429,8 @@
 
   @media(max-width:640px){
     :root{--card-w:130px;--card-h:195px}
+    /* Evitar zoom automático al clickear inputs en iOS/Android */
+    input, select, textarea { font-size:16px!important; }
 
     /* ── NAV MOBILE: 2 filas ── */
     #nav{
@@ -467,7 +466,10 @@
     .cards-scroll,.row-header,.live-grid{padding-left:12px;padding-right:12px}
     .home-grid{padding:0 12px!important}
     #catalog-grid,.actor-grid{padding:0 12px}
-    .filters-bar{padding:0 12px 12px!important}
+    .filters-bar{padding:0 12px 12px!important;display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important}
+    .filters-bar select{width:100%;box-sizing:border-box}
+    /* Botón limpiar — columna 2, fila 3 */
+    .filters-bar button{grid-column:2;grid-row:3;width:100%;box-sizing:border-box;margin:0!important;align-self:end}
     #live-filter-bar{padding:0 12px 12px!important}
     .row-header{padding:0 12px}
     #sec-catalog{padding-top:110px!important}
@@ -726,7 +728,6 @@
 <div id="modal-overlay">
   <div id="modal">
     <div class="modal-topbar">
-      <button id="fs-btn" title="Pantalla completa">⛶</button>
       <button id="close-btn" title="Cerrar">✕</button>
     </div>
 
@@ -1201,12 +1202,23 @@ function buildCard(m, i) {
   if (_viewsEl) {
     (async () => {
       try {
-        const r = await fetch(`https://countapi.mileshilliard.com/api/v1/get/viciotv-item-${m.id}`);
-        const d = await r.json();
-        const v = d.value ?? d.count ?? 0;
+        const cacheKey = `viciotv_views_${m.id}`;
+        const CACHE_TTL = 30 * 1000; // 30 segundos
+        let v;
+        try {
+          const cached = JSON.parse(sessionStorage.getItem(cacheKey));
+          if (cached && Date.now() - cached.ts < CACHE_TTL) {
+            v = cached.v;
+          } else { throw new Error("expired"); }
+        } catch {
+          const r = await fetch(`https://countapi.mileshilliard.com/api/v1/get/viciotv-item-${m.id}`);
+          const d = await r.json();
+          v = d.value ?? d.count ?? 0;
+          sessionStorage.setItem(cacheKey, JSON.stringify({ v, ts: Date.now() }));
+        }
         _viewsEl.textContent = `👁 ${Number(v).toLocaleString("es")}`;
       } catch {
-        _viewsEl.textContent = `👁 0`;
+        _viewsEl.textContent = `👁 ✕`;
       }
       _viewsEl.classList.add("loaded");
     })();
@@ -1701,7 +1713,6 @@ window.addEventListener("popstate", e => {
   // 2. Salir de fullscreen forzado
   if (document.getElementById("modal").classList.contains("forced-fullscreen")) {
     document.getElementById("modal").classList.remove("forced-fullscreen");
-    document.getElementById("fs-btn").textContent = "⛶";
     try { screen.orientation?.unlock?.(); } catch {}
     return;
   }
@@ -1734,7 +1745,7 @@ document.getElementById("share-btn").addEventListener("click", () => {
 });
 
 /* ─── FULLSCREEN ─── */
-document.getElementById("fs-btn").addEventListener("click", toggleCustomFullscreen);
+// fullscreen via player nativo
 async function toggleCustomFullscreen() {
   const target = document.querySelector(".player-wrap");
   try {
