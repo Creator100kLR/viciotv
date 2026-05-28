@@ -290,6 +290,30 @@
   .card-overlay-rating{display:none}
   .play-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 0 20px rgba(229,9,20,.5)}
   .play-btn svg{width:16px;height:16px;fill:#fff}
+  .card-overlay{flex-direction:column;gap:8px}
+  /* Trailer btn en card-info */
+  .card-trailer-btn{background:transparent;border:none;color:var(--accent);font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;cursor:pointer;padding:0;display:none;align-items:center;gap:3px;transition:color .2s;text-transform:uppercase}
+  .card-trailer-btn:hover{color:#ff6b35}
+  .card-trailer-btn.visible{display:flex}
+  /* Trailer btn — top center del card */
+  .trailer-btn{
+    position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.9);border:none;color:#111;
+    border-radius:20px;padding:5px 14px;
+    font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+    cursor:pointer;transition:all .2s;display:none;white-space:nowrap;
+    letter-spacing:.3px;
+  }
+  .trailer-btn:hover{background:#000;color:#fff}
+  /* Desktop: solo en hover */
+  @media(min-width:641px){
+    .trailer-btn.visible{display:none}
+    .card:hover .trailer-btn.visible{display:block}
+  }
+  /* Mobile: siempre visible */
+  @media(max-width:640px){
+    .trailer-btn.visible{display:block}
+  }
   /* Barra progreso sobre card */
   .card-progress-bar{position:absolute;bottom:0;left:0;height:3px;background:var(--accent);border-radius:0 0 0 var(--radius);z-index:5}
   .card-ep-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);border:1px solid rgba(229,9,20,.4);border-radius:5px;padding:2px 7px;font-size:.6rem;color:var(--accent);font-weight:600;z-index:5}
@@ -1245,15 +1269,34 @@ function buildCard(m, i) {
     ${isTV ? `<div class="card-type-badge">SERIE</div>` : ""}
     <div class="card-info">
       <div class="card-name">${title}</div>
-      <div class="card-meta"><span class="card-rating">★ ${rating}</span><span>${year}</span></div>
+      <div class="card-meta">
+        <span class="card-rating">★ ${rating}</span>
+        <span>${year}</span>
+      </div>
     </div>
     <div class="card-overlay">
       <span class="card-overlay-title">${title}</span>
       <span class="card-overlay-rating">★${rating}</span>
+      <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">▶ Trailer</button>
       <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
     </div>
     <div class="card-views" data-id="${m.id}">👁 —</div>`;
   card.addEventListener("click", () => openModal(m));
+
+  // Botones trailer — verificar disponibilidad y conectar
+  const trailerBtns = card.querySelectorAll(".trailer-btn, .card-trailer-btn");
+  if (trailerBtns.length) {
+    fetch(`${API_BASE}/${m._type||'movie'}/${m.id}/videos?api_key=${API_KEY}&language=es-MX`)
+      .then(r=>r.json())
+      .then(data => {
+        const has = (data.results||[]).some(v=>v.site==="YouTube");
+        if (has) trailerBtns.forEach(b => b.classList.add("visible"));
+      }).catch(()=>{});
+    trailerBtns.forEach(b => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openHeroTrailer(m);
+    }));
+  }
   // Cargar visitas — referencia directa al elemento de esta card
   const _viewsEl = card.querySelector(".card-views");
   if (_viewsEl) {
