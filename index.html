@@ -236,7 +236,7 @@
 
   /* ===== MAIN ===== */
   #main{padding:0 0 80px}
-  .row-section{margin-bottom:48px}
+  .row-section{margin-bottom:18px}
   .row-header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;margin-bottom:24px;position:relative;gap:16px;z-index:11}
   .row-title{
     font-family:'Bebas Neue',cursive;
@@ -265,7 +265,7 @@
     background:linear-gradient(90deg,rgba(255,255,255,.08),transparent);
   }
   /* Carruseles horizontales — usados solo en Mi Lista, tabs de películas/series, etc */
-  .cards-scroll{display:flex;gap:12px;padding:12px 32px 16px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory}
+  .cards-scroll{display:flex;gap:12px;padding:22px 32px 16px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory}
   .cards-scroll::-webkit-scrollbar{display:none}
   /* Grilla para secciones del home */
   .home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-w),1fr));gap:16px;padding:8px 32px 0}
@@ -1112,6 +1112,7 @@ function renderContinueWatching() {
     // Corazón (derecha) — favoritos
     const removeBtn = document.createElement("div");
     removeBtn.className = "cw-remove";
+    removeBtn.dataset.id = item.id;
     const _favColor = isFav(item.id) ? '#e50914' : 'rgba(255,255,255,.3)';
     removeBtn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="${_favColor}" stroke="${_favColor}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
     removeBtn.title = "Favoritos";
@@ -1236,10 +1237,11 @@ function toggleFav(item) {
   document.querySelectorAll('.card-fav-btn[data-id="' + item.id + '"]').forEach(btn => {
     btn.classList.toggle("is-fav", nowFav);
   });
-  // También actualizar el corazón del wrap en Favoritos y CW
+  // Sincronizar corazones cw-remove (Continuar Viendo)
   document.querySelectorAll('.cw-remove[data-id="' + item.id + '"]').forEach(btn => {
+    const c = nowFav ? '#e50914' : 'rgba(255,255,255,.3)';
     const svg = btn.querySelector('svg');
-    if (svg) svg.style.fill = nowFav ? '#e50914' : 'rgba(255,255,255,.3)';
+    if (svg) { svg.setAttribute('fill', c); svg.setAttribute('stroke', c); }
   });
 }
 function updateFavBtn(item) {
