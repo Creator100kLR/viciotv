@@ -496,7 +496,7 @@
   <div class="creator-wrap">
     <div class="creator-badge" onclick="toggleCreatorPanel(event)" title="Personalizar tema">
       <div style="text-align:center">
-        <span class="creator-sub">· Creado por ·</span>
+        <span class="creator-sub">· Visitas <span id="visit-count">—</span> ·</span>
         <span class="creator-label" style="display:block">boch4maN</span>
       </div>
     </div>
@@ -1059,7 +1059,22 @@ function renderFavs() {
   _favsShown = FAVS_PAGE_SIZE;
   sec.style.display = "";
   car.innerHTML = "";
-  favs.slice(0, _favsShown).forEach((m, i) => car.appendChild(buildCard(m, i)));
+  favs.slice(0, _favsShown).forEach((m, i) => {
+    const wrap = document.createElement("div");
+    wrap.className = "cw-card-wrap";
+    wrap.appendChild(buildCard(m, i));
+    const removeBtn = document.createElement("div");
+    removeBtn.className = "cw-remove";
+    removeBtn.innerHTML = "✕";
+    removeBtn.title = "Quitar de Favoritos";
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveFavs(getFavs().filter(f => String(f.id) !== String(m.id)));
+      renderFavs();
+    });
+    wrap.appendChild(removeBtn);
+    car.appendChild(wrap);
+  });
   if (btn) btn.style.display = favs.length > _favsShown ? "block" : "none";
 }
 
@@ -2804,6 +2819,45 @@ function initThemePicker() {
 // ─── ARRANQUE ───
 initApp();
 initThemePicker();
+
+// ─── CONTADOR DE VISITAS ───
+(async function initVisitCounter() {
+  const SITE_ID = location.hostname || "viciotv";
+  const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 horas
+  const el = document.getElementById("visit-count");
+
+  // Obtener el total actual siempre (para mostrarlo)
+  async function getCount() {
+    try {
+      const res = await fetch(`https://api.visitor.6developer.com/v1/visit?site=${encodeURIComponent(SITE_ID)}`, {
+        method: "GET"
+      });
+      const data = await res.json();
+      return data.totalVisitors ?? data.total ?? null;
+    } catch { return null; }
+  }
+
+  // Registrar visita solo si pasaron 2 horas
+  async function registerVisit() {
+    try {
+      await fetch(`https://api.visitor.6developer.com/v1/visit?site=${encodeURIComponent(SITE_ID)}`, {
+        method: "POST"
+      });
+    } catch {}
+  }
+
+  // Lógica de cooldown local
+  const lastVisit = parseInt(localStorage.getItem("viciotv_last_visit") || "0");
+  const now = Date.now();
+  if (now - lastVisit > COOLDOWN_MS) {
+    localStorage.setItem("viciotv_last_visit", now);
+    await registerVisit();
+  }
+
+  // Mostrar el contador
+  const total = await getCount();
+  if (el) el.textContent = total !== null ? total.toLocaleString("es") : "—";
+})();
 </script>
 </body>
 </html>
