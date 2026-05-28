@@ -507,6 +507,8 @@
 
     /* Cards */
     .ep-panel-inner{padding:0 12px}
+    #search-overlay{padding-top:110px!important}
+    #visit-count-mobile{display:inline!important}
   }
 </style>
 </head>
@@ -589,6 +591,8 @@
   </div>
   <!-- Espacio flexible derecho -->
   <div style="flex:1"></div>
+  <!-- Visitas solo en mobile -->
+  <span id="visit-count-mobile" style="font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.5px;order:2;display:none"></span>
   <div class="nav-search">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input id="search-input" type="text" placeholder="Buscar..." oninput="onSearch(this.value)" onfocus="openSearchOverlay()" />
@@ -2992,7 +2996,8 @@ async function registerVisit(profileName) {
   const KEY = "viciotv-visitas-v1";
   const API_HIT = `https://countapi.mileshilliard.com/api/v1/hit/${KEY}`;
   const API_GET = `https://countapi.mileshilliard.com/api/v1/get/${KEY}`;
-  const el = document.getElementById("visit-count");
+  const el  = document.getElementById("visit-count");
+  const el2 = document.getElementById("visit-count-mobile");
 
   const now = Date.now();
   const shouldHit = now - parseInt(localStorage.getItem(STORAGE_KEY) || "0") > COOLDOWN_MS;
@@ -3002,9 +3007,12 @@ async function registerVisit(profileName) {
     const r = await fetch(shouldHit ? API_HIT : API_GET);
     const d = await r.json();
     const value = d.value ?? d.count ?? null;
-    if (el) el.textContent = value !== null ? Number(value).toLocaleString("es") : "—";
+    const txt = value !== null ? Number(value).toLocaleString("es") : "—";
+    if (el)  el.textContent  = txt;
+    if (el2) el2.textContent = txt;
   } catch {
-    if (el) el.textContent = "—";
+    if (el)  el.textContent  = "—";
+    if (el2) el2.textContent = "—";
   }
 }
 </script>
