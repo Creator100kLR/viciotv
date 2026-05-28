@@ -37,7 +37,17 @@
     animation:logo-shimmer 4s linear infinite;
     filter:drop-shadow(0 0 30px rgba(229,9,20,.4));
     line-height:1;margin-bottom:-8px}
-  .profiles-subtitle{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:-4px}
+  .profiles-subtitle{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:-4px;text-align:center}
+  .profiles-subtitle .sub-top{
+    display:block;font-size:11px;letter-spacing:8px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:4px;
+  }
+  .profiles-subtitle .sub-bottom{
+    display:block;font-size:12px;letter-spacing:5px;
+    color:rgba(255,255,255,.25);
+  }
   .profiles-title{font-size:26px;font-weight:300;color:rgba(255,255,255,.8);text-align:center;letter-spacing:1px}
   .profiles-grid{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:720px;position:relative;z-index:1}
   .profile-item{display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;position:relative}
@@ -496,7 +506,12 @@
     .episode-thumb{width:110px;height:64px}
 
     /* Perfiles */
-    .profiles-logo{font-size:48px;letter-spacing:5px}
+    .profiles-logo{font-size:48px;letter-spacing:5px;
+      background:linear-gradient(90deg,var(--accent),#ff6b35,#fff,#ff6b35,var(--accent));
+      background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:logo-shimmer 4s linear infinite;
+      filter:drop-shadow(0 0 20px rgba(229,9,20,.4));
+    }
     .profiles-title{font-size:20px}
     .profile-avatar{width:90px;height:90px}
     .profiles-grid{gap:14px;padding:0 16px}
@@ -520,7 +535,10 @@
 <!-- ===== PANTALLA DE PERFILES ===== -->
 <div id="profiles-screen">
   <div class="profiles-logo">VicioTV</div>
-  <p class="profiles-subtitle">Streaming<br><span style="font-size:9px;letter-spacing:2px">Películas · Series · Anime</span></p>
+  <p class="profiles-subtitle">
+    <span class="sub-top">— Streaming —</span>
+    <span class="sub-bottom">Películas &nbsp;·&nbsp; Series &nbsp;·&nbsp; Anime</span>
+  </p>
   <h2 class="profiles-title">¿Quién está viendo?</h2>
   <div class="profiles-grid" id="profiles-grid"></div>
   <button id="profiles-edit-btn" onclick="toggleProfileEdit()">Editar perfiles</button>
