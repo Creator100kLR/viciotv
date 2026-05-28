@@ -2531,12 +2531,6 @@ function renderProfiles() {
   const grid = document.getElementById("profiles-grid");
   grid.innerHTML = "";
 
-  // Sin perfiles → abrir editor directamente
-  if (!profiles.length) {
-    setTimeout(() => openProfileEditor(null), 100);
-    return;
-  }
-
   profiles.forEach((p, idx) => {
     const item = document.createElement("div");
     item.className = "profile-item";
