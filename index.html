@@ -550,13 +550,14 @@
     #nav > div[style*="flex:1"]{display:none}
 
     /* Ajuste del hero para el nav de 2 filas (~100px de altura) */
-    .hero-content{padding:80px 16px 100px;display:flex;flex-direction:column}
+    .hero-content{padding:80px 16px 16px}
     .hero-title{font-size:34px}
-    .hero-overview{flex:1}
-    .hero-btns{gap:6px;position:fixed;bottom:48px;left:16px;right:16px;z-index:5;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:20px 0 8px}
+    .hero-overview{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+    .hero-btns{gap:6px;margin-top:12px}
     .btn-play{padding:10px 16px;font-size:13px}
     .btn-info{padding:10px 12px;font-size:12px}
-    .hero-dots{left:16px;bottom:20px}
+    .hero-dots{left:16px;bottom:16px}
+    .hero-badge{font-size:9px;padding:3px 8px}
     /* Solo flecha derecha en mobile */
     .hero-nav-prev{display:none}
     .hero-nav-next{right:8px}
