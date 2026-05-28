@@ -1388,10 +1388,11 @@ function buildCard(m, i) {
         const has = (data.results||[]).some(v=>v.site==="YouTube");
         if (has) trailerBtns.forEach(b => b.classList.add("visible"));
       }).catch(()=>{});
-    trailerBtns.forEach(b => b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openHeroTrailer(m);
-    }));
+    trailerBtns.forEach(b => {
+      const _trailerHandler = (e) => { e.stopPropagation(); e.preventDefault(); openHeroTrailer(m); };
+      b.addEventListener("click", _trailerHandler);
+      b.addEventListener("touchend", _trailerHandler, { passive: false });
+    });
   }
   // Cargar visitas — referencia directa al elemento de esta card
   const _viewsEl = card.querySelector(".card-views");
