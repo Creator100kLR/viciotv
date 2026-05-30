@@ -297,23 +297,35 @@
   .card:hover .card-overlay{opacity:1}
   .card-overlay-title{display:none}
   .card-overlay-rating{display:none}
-  .play-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 0 20px rgba(229,9,20,.5)}
-  .play-btn svg{width:16px;height:16px;fill:#fff}
-  .card-overlay{flex-direction:column;gap:8px}
+  .play-btn{height:38px;border-radius:24px;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 20px;cursor:pointer;flex-shrink:0;box-shadow:0 0 24px rgba(229,9,20,.55);font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;transition:all .2s;margin-bottom:18px}
+  .play-btn:hover{background:#c00712;transform:scale(1.06)}
+  .play-btn svg{width:14px;height:14px;fill:#fff;flex-shrink:0}
+  .card-overlay{flex-direction:column;gap:4px;justify-content:center}
   /* Trailer btn en card-info */
   .card-trailer-btn{background:transparent;border:none;color:var(--accent);font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;cursor:pointer;padding:0;display:none;align-items:center;gap:3px;transition:color .2s;text-transform:uppercase}
   .card-trailer-btn:hover{color:#ff6b35}
   .card-trailer-btn.visible{display:flex}
-  /* Trailer btn — top center del card */
+  /* Trailer btn — abajo a la izquierda, junto al 👁 */
   .trailer-btn{
-    position:absolute;top:8px;left:50%;transform:translateX(-50%);
-    background:rgba(255,255,255,.9);border:none;color:#111;
-    border-radius:20px;padding:5px 14px;
-    font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+    position:absolute;bottom:62px;left:8px;
+    background:rgba(20,20,30,.82);border:1px solid rgba(255,255,255,.18);color:#fff;
+    border-radius:20px;padding:4px 10px;
+    font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;
     cursor:pointer;transition:all .2s;display:none;white-space:nowrap;
-    letter-spacing:.3px;
+    letter-spacing:.3px;backdrop-filter:blur(6px);
+    align-items:center;gap:5px;
   }
-  .trailer-btn:hover{background:#000;color:#fff}
+  .trailer-btn:hover{background:rgba(229,9,20,.85);border-color:var(--accent);color:#fff}
+  /* desktop: solo hover */
+  @media(min-width:641px){
+    .trailer-btn.visible{display:none}
+    .card:hover .trailer-btn.visible{display:flex}
+  }
+  /* mobile: siempre si tiene visible */
+  @media(max-width:640px){
+    .trailer-btn.visible{display:flex}
+    .trailer-btn.no-trailer{display:none!important}
+  }
   /* Corazón en cards */
   .card-fav-btn{
     position:absolute;top:8px;right:8px;
@@ -333,16 +345,7 @@
   @media(max-width:640px){
     .card-fav-btn.card-fav-visible{display:flex}
   }
-  /* Desktop: solo en hover */
-  @media(min-width:641px){
-    .trailer-btn.visible{display:none}
-    .card:hover .trailer-btn.visible{display:block}
-  }
-  /* Mobile: siempre visible, con o sin clase visible */
-  @media(max-width:640px){
-    .trailer-btn{display:block!important}
-    .trailer-btn.no-trailer{display:none!important}
-  }
+
   /* Barra progreso sobre card */
   .card-progress-bar{position:absolute;bottom:0;left:0;height:3px;background:var(--accent);border-radius:0 0 0 var(--radius);z-index:5}
   .card-ep-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);border:1px solid rgba(229,9,20,.4);border-radius:5px;padding:2px 7px;font-size:.6rem;color:var(--accent);font-weight:600;z-index:5}
@@ -887,13 +890,20 @@
       <p class="modal-overview" id="modal-overview"></p>
       <div class="modal-action-row">
         <button class="modal-action-btn focusable" id="fav-btn">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span id="fav-btn-text">+ Favoritos</span>
         </button>
         <button class="modal-action-btn focusable" id="share-btn">
           <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           Compartir
         </button>
+        <button class="modal-action-btn focusable" id="modal-trailer-btn" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Ver Trailer
+        </button>
+        <a class="modal-action-btn focusable" id="modal-trailer-yt-btn" style="display:none" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+          Ver Trailer
+        </a>
 
       </div>
     </div>
@@ -1279,8 +1289,6 @@ function updateFavBtn(item) {
   const txt = document.getElementById("fav-btn-text");
   btn.classList.toggle("active", active);
   txt.textContent = active ? "En favoritos" : "+ Favoritos";
-  const svg = btn.querySelector("svg");
-  svg.innerHTML = active ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
 }
 const FAVS_PAGE_SIZE = 12;
 let _favsShown = FAVS_PAGE_SIZE;
@@ -1363,9 +1371,12 @@ function buildCard(m, i) {
     <div class="card-overlay">
       <span class="card-overlay-title">${title}</span>
       <span class="card-overlay-rating">★${rating}</span>
-      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>PLAY</div>
     </div>
-    <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">▶ Trailer</button>
+    <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Ver Trailer
+    </button>
     <button class="card-fav-btn card-fav-visible ${(function(){try{return isFav(m.id)?'is-fav':''}catch(e){return ''}}())}" data-id="${m.id}">
       <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1399,6 +1410,23 @@ function buildCard(m, i) {
           if (has) b.classList.add("visible");
           else b.classList.add("no-trailer");
         });
+        if (!has) {
+          // Sin trailer en TMDB → botón YouTube idéntico al trailer-btn
+          const ytBtn = document.createElement("a");
+          ytBtn.className = "trailer-btn yt-fallback visible";
+          const t = m.title || m.name || "";
+          ytBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(t + ' trailer')}`;
+          ytBtn.target = "_blank";
+          ytBtn.rel = "noopener noreferrer";
+          ytBtn.innerHTML = `<svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg> Ver Trailer`;
+          ytBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const f = document.getElementById("movie-frame");
+            if (f && f.src && f.src !== location.href) { f.dataset.ytPausedSrc = f.src; f.src = ""; }
+          });
+          ytBtn.addEventListener("touchend", (e) => e.stopPropagation());
+          card.appendChild(ytBtn);
+        }
       }).catch(()=>{});
     trailerBtns.forEach(b => {
       const _trailerHandler = (e) => { e.stopPropagation(); e.preventDefault(); openHeroTrailer(m); };
@@ -1428,9 +1456,8 @@ function buildCard(m, i) {
           _viewsEl.textContent = `👁 ${Number(v).toLocaleString("es")}`;
           _viewsEl.classList.add("loaded");
         }
-        _viewsEl.textContent = `👁 ${Number(v).toLocaleString("es")}`;
       } catch {
-        if (!cached) { _viewsEl.textContent = ''; } // silencioso si falla y no hay cache
+        // silencioso si falla
       }
       _viewsEl.classList.add("loaded");
     })();
@@ -1625,6 +1652,29 @@ async function openModal(item) {
   document.getElementById("next-episode-overlay").style.display = "none";
   currentImdbId = null; currentSeasons = 1;
   updateFavBtn(item);
+
+  // Trailer en modal: verificar si hay en TMDB, si no → YouTube
+  const _mTrailerBtn   = document.getElementById("modal-trailer-btn");
+  const _mTrailerYtBtn = document.getElementById("modal-trailer-yt-btn");
+  _mTrailerBtn.style.display   = "none";
+  _mTrailerYtBtn.style.display = "none";
+  fetch(`${API_BASE}/${item._type||"movie"}/${item.id}/videos?api_key=${API_KEY}&language=es-MX`)
+    .then(r => r.json())
+    .then(vdata => {
+      const hasTmdb = (vdata.results || []).some(v => v.site === "YouTube");
+      if (hasTmdb) {
+        _mTrailerBtn.style.display = "";
+        _mTrailerBtn.onclick = () => openHeroTrailer(item);
+      } else {
+        const t = item.title || item.name || "";
+        _mTrailerYtBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(t + ' trailer')}`;
+        _mTrailerYtBtn.style.display = "";
+        _mTrailerYtBtn.onclick = () => {
+          const f = document.getElementById("movie-frame");
+          if (f && f.src && f.src !== location.href) { f.dataset.ytPausedSrc = f.src; f.src = ""; }
+        };
+      }
+    }).catch(() => {});
 
   // Guardar en Continuar Viendo apenas abre el contenido
   if (item && item.id) {
@@ -2038,6 +2088,12 @@ async function openHeroTrailer(item) {
     if (!key) { showToast("Trailer no disponible"); return; }
     document.getElementById("trailer-title").textContent = item.title || item.name || "";
     document.getElementById("trailer-iframe").src = `https://www.youtube.com/embed/${key}?autoplay=1`;
+    // Pausar el reproductor principal guardando y vaciando su src
+    const movieFrame = document.getElementById("movie-frame");
+    if (movieFrame && movieFrame.src && movieFrame.src !== location.href) {
+      movieFrame.dataset.pausedSrc = movieFrame.src;
+      movieFrame.src = "";
+    }
     const modal = document.getElementById("trailer-modal");
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -2050,7 +2106,24 @@ function closeTrailer() {
   document.getElementById("trailer-modal").style.display = "none";
   document.getElementById("trailer-iframe").src = "";
   document.body.style.overflow = "";
+  // Restaurar el reproductor principal si estaba corriendo
+  const movieFrame = document.getElementById("movie-frame");
+  if (movieFrame && movieFrame.dataset.pausedSrc) {
+    movieFrame.src = movieFrame.dataset.pausedSrc;
+    delete movieFrame.dataset.pausedSrc;
+  }
 }
+
+// Restaurar reproductor al volver de YouTube (pestaña nueva)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    const f = document.getElementById("movie-frame");
+    if (f && f.dataset.ytPausedSrc) {
+      f.src = f.dataset.ytPausedSrc;
+      delete f.dataset.ytPausedSrc;
+    }
+  }
+});
 
 // Cerrar trailer con Escape
 document.addEventListener("keydown", e => {
@@ -2969,6 +3042,13 @@ async function openActorOverlay(personId, personName, imgSrc) {
   document.getElementById("modal-overlay").classList.remove("open");
   document.body.style.overflow = "";
 
+  // Pausar el reproductor principal
+  const _actorMovieFrame = document.getElementById("movie-frame");
+  if (_actorMovieFrame && _actorMovieFrame.src && _actorMovieFrame.src !== location.href) {
+    _actorMovieFrame.dataset.actorPausedSrc = _actorMovieFrame.src;
+    _actorMovieFrame.src = "";
+  }
+
   overlay.classList.add("open");
   document.body.style.overflow = "hidden";
   overlay.scrollTop = 0;
@@ -3060,6 +3140,12 @@ async function openActorOverlay(personId, personName, imgSrc) {
 function closeActorOverlay() {
   const overlay = document.getElementById("actor-overlay");
   overlay.classList.remove("open");
+  // Restaurar el reproductor si estaba corriendo
+  const _actorMovieFrame = document.getElementById("movie-frame");
+  if (_actorMovieFrame && _actorMovieFrame.dataset.actorPausedSrc) {
+    _actorMovieFrame.src = _actorMovieFrame.dataset.actorPausedSrc;
+    delete _actorMovieFrame.dataset.actorPausedSrc;
+  }
   // Reabrir el modal
   if (currentItem) {
     document.getElementById("modal-overlay").classList.add("open");
