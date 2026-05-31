@@ -387,7 +387,10 @@
   
   /* Margen para el contenido cuando el sidebar está visible */
   body.sidebar-open #hero,
-  body.sidebar-open #main { margin-left:25px; transition:margin-left .25s ease; }
+  body.sidebar-open #main { margin-left:26px; transition:margin-left .25s ease; }
+  .sb-x-btn { display:flex !important; }
+  .sb-x-btn .sb-icon { color: var(--text2); }
+  .sb-x-btn:hover .sb-icon { color: #fff; }
 
   @media(max-width:640px){
     /* En mobile el sidebar siempre está visible cuando hay sesión → siempre corremos el contenido */
@@ -3926,7 +3929,6 @@ function _sbMobileInit(){
 }
 
 function sbToggleHide(){
-  if(window.innerWidth > 640) return;
   const s = document.getElementById('sidebar');
   const xIcon = document.getElementById('sb-x-icon');
   const hidden = s.classList.toggle('sb-hidden');
