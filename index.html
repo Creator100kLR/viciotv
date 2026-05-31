@@ -4050,6 +4050,8 @@ function _sbScrollToSection(sectionId){
   }
 }
 function sbGoFavs(){
+  // Si no hay favoritos, no hacer nada
+  if(!getFavs().length) return;
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
@@ -4058,6 +4060,8 @@ function sbGoFavs(){
   setTimeout(()=> _sbScrollToSection("section-favs"), 150);
 }
 function sbGoContinuar(){
+  // Si no hay nada en continuar viendo, no hacer nada
+  if(!getContinueWatching().length) return;
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
