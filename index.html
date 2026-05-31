@@ -344,24 +344,23 @@
 
   /* ===== SIDEBAR EN MOBILE: igual que desktop, siempre visible ===== */
   @media(max-width:640px){
-    /* El sidebar se muestra colapsado (38px) igual que en desktop */
-    #sidebar{
-      /* sobreescribir hover con clase .expanded en mobile */
-    }
-    /* Cuando está expandido por tap en mobile */
-    #sidebar.mob-expanded{
+    /* En mobile el hover NO expande — anulamos todo hover del sidebar */
+    #sidebar:hover{ width:38px; box-shadow:none; }
+    #sidebar:hover .sidebar-btn .sb-text{ opacity:0 !important; max-width:0 !important; }
+    #sidebar:hover .sb-chevron{ opacity:0 !important; }
+    /* Cuando está expandido por tap — tiene prioridad sobre :hover */
+    #sidebar.mob-expanded,
+    #sidebar.mob-expanded:hover {
       width:210px;
       box-shadow:6px 0 28px rgba(0,0,0,.65);
     }
-    #sidebar.mob-expanded .sidebar-btn .sb-text{
-      opacity:1;max-width:200px;
+    #sidebar.mob-expanded .sidebar-btn .sb-text,
+    #sidebar.mob-expanded:hover .sidebar-btn .sb-text {
+      opacity:1 !important; max-width:200px !important;
     }
-    #sidebar.mob-expanded .sb-chevron{opacity:1;}
-    #sidebar.mob-expanded .sb-top10-open .sb-chevron{transform:rotate(90deg);}
-    /* En mobile el hover no funciona bien (no hay cursor), usamos .mob-expanded */
-    #sidebar:hover{ width:38px; box-shadow:none; }
-    #sidebar:hover .sidebar-btn .sb-text{ opacity:0; max-width:0; }
-    #sidebar:hover .sb-chevron{ opacity:0; }
+    #sidebar.mob-expanded .sb-chevron,
+    #sidebar.mob-expanded:hover .sb-chevron { opacity:1 !important; }
+    #sidebar.mob-expanded .sb-top10-open .sb-chevron { transform:rotate(90deg); }
   }
 
   
