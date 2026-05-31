@@ -447,18 +447,15 @@
   .infinite-end-msg{text-align:center;color:var(--text3);font-size:.85rem;padding:24px;grid-column:1/-1}
   .infinite-trigger{height:60px;display:flex;align-items:center;justify-content:center;margin:16px 0}
   .top10-rank{
-    position:absolute;bottom:4px;left:6px;
-    font-family:'Bebas Neue',cursive;font-size:52px;letter-spacing:-2px;
-    color:rgba(255,255,255,.08);line-height:1;
-    text-shadow:-2px 0 0 rgba(255,255,255,.12);
-    pointer-events:none;z-index:2;
+    position:absolute;top:90px;left:60%;transform:translateX(-50%);
+    font-family:'Bebas Neue',cursive;font-size:225px;letter-spacing:-4px;
+    line-height:1;pointer-events:none;z-index:2;
+    background:linear-gradient(180deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,.15) 30%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.3);
+    filter:drop-shadow(0 4px 12px rgba(0,0,0,.8));
   }
-  .top10-rank-badge{
-    position:absolute;top:34px;left:8px;
-    font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:1px;
-    background:var(--accent);color:#fff;
-    padding:2px 8px;border-radius:4px;z-index:3;
-  }
+  .top10-rank.single{left:75%;}
 
   /* ===== HERO ===== */
   #hero{position:relative;height:560px;overflow:hidden}
@@ -537,7 +534,7 @@
   .card.badge-anime-card:hover{box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(245,197,24,.5)}
   .card img{width:100%;height:var(--card-h);object-fit:cover;display:block}
   .card-no-poster{width:100%;height:var(--card-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:.75rem}
-  .card-info{padding:6px 10px 10px;background:var(--bg2)}
+  .card-info{padding:6px 10px 10px;background:var(--bg2);position:relative;z-index:3}
   .card-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
   .card-meta{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)}
   .card-rating{color:var(--gold);font-weight:600;font-size:12px}
@@ -545,7 +542,7 @@
   .card-type-badge.badge-movie{background:rgba(229,9,20,.85);color:#fff}
   .card-type-badge.badge-serie{background:rgba(99,102,241,.85);color:#fff}
   .card-type-badge.badge-anime{background:rgba(245,197,24,.95);color:#111}
-  .card-overlay{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity var(--transition);display:flex;align-items:center;justify-content:center;padding:0}
+  .card-overlay{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity var(--transition);display:flex;align-items:center;justify-content:center;padding:0;z-index:4}
   .card:hover .card-overlay{opacity:1}
   .card-overlay-title{display:none}
   .card-overlay-rating{display:none}
@@ -553,6 +550,12 @@
   .play-btn:hover{background:#c00712;transform:scale(1.06)}
   .play-btn svg{width:14px;height:14px;fill:#fff;flex-shrink:0}
   .card-overlay{flex-direction:column;gap:4px;justify-content:center}
+  .card-mobile-play{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:44px;height:44px;border-radius:50%;background:rgba(229,9,20,.5);border:none;cursor:pointer;align-items:center;justify-content:center;z-index:4;pointer-events:auto}
+  .card-mobile-play svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+  @media(hover:none),(max-width:768px){
+    .card-mobile-play{display:flex}
+    .card-overlay{background:rgba(0,0,0,0)}
+  }
   /* Trailer btn en card-info */
   .card-trailer-btn{background:transparent;border:none;color:var(--accent);font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;cursor:pointer;padding:0;display:none;align-items:center;gap:3px;transition:color .2s;text-transform:uppercase}
   .card-trailer-btn:hover{color:#ff6b35}
@@ -1874,6 +1877,7 @@ function buildCard(m, i) {
       <span class="card-overlay-rating">★${rating}</span>
       <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>PLAY</div>
     </div>
+    <button class="card-mobile-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
     <button class="trailer-btn" data-id="${m.id}" data-type="${m._type||'movie'}">
       <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       Ver Trailer
@@ -1884,6 +1888,13 @@ function buildCard(m, i) {
       </svg>
     </button>`;
   card.addEventListener("click", () => openModal(m));
+
+  // Botón mobile play
+  const mobilePlayBtn = card.querySelector(".card-mobile-play");
+  if (mobilePlayBtn) {
+    mobilePlayBtn.addEventListener("click", (e) => { e.stopPropagation(); openModal(m); });
+    mobilePlayBtn.addEventListener("touchend", (e) => { e.stopPropagation(); e.preventDefault(); openModal(m); }, { passive: false });
+  }
 
   // Corazón favorito
   const favBtn = card.querySelector(".card-fav-btn");
@@ -4288,11 +4299,8 @@ async function _top10RenderNext(count){
     const card = buildCard(item, idx);
     card.style.position="relative";
     const rank = document.createElement("div");
-    rank.className="top10-rank"; rank.textContent=globalRank;
+    rank.className="top10-rank" + (globalRank < 10 ? " single" : ""); rank.textContent=globalRank;
     card.appendChild(rank);
-    const badge = document.createElement("div");
-    badge.className="top10-rank-badge"; badge.textContent=`#${globalRank}`;
-    card.appendChild(badge);
     grid.appendChild(card);
   });
   _top10State.shown += toShow.length;
