@@ -3861,7 +3861,6 @@ function sbToggleExpand(){
   const s = document.getElementById("sidebar");
   const icon = document.getElementById("sb-expand-icon");
   const title = document.getElementById("sb-salir-title");
-  const xIcon = document.getElementById("sb-x-icon");
   const expanded = s.classList.toggle("mob-expanded");
   document.body.classList.toggle("sidebar-mob-expanded", expanded);
   // Rotar icono del botón expandir/colapsar
@@ -3874,14 +3873,7 @@ function sbToggleExpand(){
       if(title) title.textContent = "Expandir";
     }
   }
-  // Actualizar ícono de la X
-  if(xIcon){
-    if(expanded){
-      xIcon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-    } else {
-      xIcon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
-    }
-  }
+  // sb-x-icon lo maneja exclusivamente sbToggleHide()
 }
 
 /* Secciones extras del sidebar */
@@ -4039,7 +4031,7 @@ function _sbCollapseMobile(){
   const xIcon = document.getElementById("sb-x-icon");
   if(icon) icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
   if(title) title.textContent = "Expandir";
-  if(xIcon) xIcon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
+  // sb-x-icon lo maneja exclusivamente sbToggleHide(), no tocar acá
 }
 function _isReallyInicio(){
   const el = document.getElementById("sec-popular");
@@ -4061,36 +4053,17 @@ function sbGoFavs(){
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
-  const alreadyInicio = _isReallyInicio();
-  if(!alreadyInicio){
-    switchTab("inicio");
-    // Esperar a que switchTab renderice favoritos y el DOM se actualice
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      setTimeout(()=> _sbScrollToSection("section-favs"), 80);
-    }));
-  } else {
-    renderFavs();
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      _sbScrollToSection("section-favs");
-    }));
-  }
+  if(!_isReallyInicio()) switchTab("inicio");
+  else renderFavs();
+  setTimeout(()=> _sbScrollToSection("section-favs"), 150);
 }
 function sbGoContinuar(){
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
-  const alreadyInicio = _isReallyInicio();
-  if(!alreadyInicio){
-    switchTab("inicio");
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      setTimeout(()=> _sbScrollToSection("viciotv-cw-container"), 80);
-    }));
-  } else {
-    renderContinueWatching();
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      _sbScrollToSection("viciotv-cw-container");
-    }));
-  }
+  if(!_isReallyInicio()) switchTab("inicio");
+  else renderContinueWatching();
+  setTimeout(()=> _sbScrollToSection("viciotv-cw-container"), 150);
 }
 
 /* ── TOP 10 POR PLATAFORMA ── */
