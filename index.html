@@ -331,6 +331,17 @@
   .sb-plat-dot{
     width:8px;height:8px;border-radius:50%;flex-shrink:0;
   }
+  /* Sidebar anclado (submenu de plataformas abierto) */
+  #sidebar.sb-pinned{
+    width:210px;
+    box-shadow:6px 0 28px rgba(0,0,0,.65);
+  }
+  #sidebar.sb-pinned .sidebar-btn .sb-text{
+    opacity:1;max-width:200px;
+  }
+  #sidebar.sb-pinned .sb-chevron{opacity:1;}
+  #sidebar.sb-pinned .sb-top10-open .sb-chevron{transform:rotate(90deg);}
+
   /* ===== SIDEBAR EN MOBILE: igual que desktop, siempre visible ===== */
   @media(max-width:640px){
     /* El sidebar se muestra colapsado (38px) igual que en desktop */
@@ -3777,8 +3788,9 @@ function initThemePicker() {
 function showSidebar(){
   const s = document.getElementById("sidebar");
   if(s){ s.classList.add("visible"); document.body.classList.add("sidebar-open"); }
-  // En mobile, init del botón de expandir
   _sbMobileInit();
+  // Activar hover del submenu de plataformas (desktop)
+  if(window._sbHoverSetup) window._sbHoverSetup();
 }
 
 function _sbMobileInit(){
@@ -3857,32 +3869,87 @@ function openSidebarSection(key){
 }
 
 /* ── TOGGLE SUBMENU PLATAFORMAS ── */
-function togglePlatformMenu(e){
-  e.stopPropagation();
+function _openPlatformMenu(){
   const menu = document.getElementById("sb-platform-menu");
   const btn  = document.getElementById("sb-top10");
-  const isOpen = menu.classList.contains("open");
-  document.querySelectorAll(".sb-submenu.open").forEach(m=>m.classList.remove("open"));
-  if(!isOpen){
-    const rect = btn.getBoundingClientRect();
-    const sidebar = document.getElementById("sidebar");
-    const sRect = sidebar.getBoundingClientRect();
-    menu.style.top  = rect.top + "px";
-    menu.style.left = (sRect.right + 6) + "px";
-    menu.classList.add("open");
-    btn.classList.add("active");
-    btn.classList.add("sb-top10-open");
-  } else {
-    btn.classList.remove("active");
-    btn.classList.remove("sb-top10-open");
-  }
+  const sidebar = document.getElementById("sidebar");
+  const rect = btn.getBoundingClientRect();
+  const sLeft = sidebar.getBoundingClientRect().left;
+  menu.style.top  = rect.top + "px";
+  menu.style.left = (sLeft + 210 + 6) + "px"; // siempre ancho expandido final
+  menu.classList.add("open");
+  btn.classList.add("active");
+  btn.classList.add("sb-top10-open");
+  sidebar.classList.add("sb-pinned");
 }
+function _closePlatformMenu(){
+  const menu = document.getElementById("sb-platform-menu");
+  const btn  = document.getElementById("sb-top10");
+  const sidebar = document.getElementById("sidebar");
+  menu.classList.remove("open");
+  btn.classList.remove("active");
+  btn.classList.remove("sb-top10-open");
+  sidebar.classList.remove("sb-pinned");
+}
+function togglePlatformMenu(e){
+  // En mobile (touch): toggle click normal
+  if(window.innerWidth <= 640){
+    e.stopPropagation();
+    const menu = document.getElementById("sb-platform-menu");
+    if(menu.classList.contains("open")) _closePlatformMenu();
+    else _openPlatformMenu();
+    return;
+  }
+  // En desktop: click también funciona como toggle
+  e.stopPropagation();
+  const menu = document.getElementById("sb-platform-menu");
+  if(menu.classList.contains("open")) _closePlatformMenu();
+  else _openPlatformMenu();
+}
+
+// Desktop: hover sobre el botón Top10 abre el submenu automáticamente
+(function(){
+  let _leaveTimer = null;
+
+  function cancelLeave(){ if(_leaveTimer){ clearTimeout(_leaveTimer); _leaveTimer=null; } }
+
+  function scheduleClose(){
+    cancelLeave();
+    _leaveTimer = setTimeout(()=>{ _closePlatformMenu(); }, 120);
+  }
+
+  // Setup de hover — se ejecuta cuando el sidebar se hace visible (showSidebar lo llama)
+  window._sbHoverSetup = function(){
+    const btn  = document.getElementById("sb-top10");
+    const menu = document.getElementById("sb-platform-menu");
+    if(!btn || !menu || btn._hoverReady) return;
+    btn._hoverReady = true;
+
+    btn.addEventListener("mouseenter", function(){
+      if(window.innerWidth <= 640) return;
+      cancelLeave();
+      setTimeout(()=>{ _openPlatformMenu(); }, 80);
+    });
+    btn.addEventListener("mouseleave", function(){
+      if(window.innerWidth <= 640) return;
+      scheduleClose();
+    });
+    menu.addEventListener("mouseenter", function(){
+      if(window.innerWidth <= 640) return;
+      cancelLeave();
+    });
+    menu.addEventListener("mouseleave", function(){
+      if(window.innerWidth <= 640) return;
+      scheduleClose();
+    });
+  };
+})();
+
 document.addEventListener("click", function(e){
   const menu = document.getElementById("sb-platform-menu");
   const btn  = document.getElementById("sb-top10");
   if(menu && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
-    menu.classList.remove("open");
-    if(btn){ btn.classList.remove("active"); btn.classList.remove("sb-top10-open"); }
+    _closePlatformMenu();
   }
 });
 
