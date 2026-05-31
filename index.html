@@ -1686,7 +1686,7 @@ function toggleFav(item) {
   if (idx === -1) favs.unshift(item); else favs.splice(idx, 1);
   saveFavs(favs);
   updateFavBtn(item);
-  if (activeTab === "inicio") renderFavs();
+  if (activeTab === "inicio" && !_activeSidebarSection) renderFavs();
   // Actualizar todos los corazones de cards visibles con este id
   const nowFav = isFav(item.id);
   document.querySelectorAll('.card-fav-btn[data-id="' + item.id + '"]').forEach(btn => {
