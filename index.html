@@ -190,7 +190,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
   .creator-panel{
     position:absolute;top:calc(100% + 10px);right:0;
     background:var(--bg2);border:1px solid rgba(255,255,255,.1);
-    border-radius:14px;padding:16px;width:236px;z-index:2000;
+    border-radius:14px;padding:16px;width:260px;z-index:2000;
     display:none;flex-direction:column;gap:10px;
     box-shadow:0 8px 32px rgba(0,0,0,.6);
   }
@@ -977,14 +977,27 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
   <div style="flex:1"></div>
   <!-- Creator Badge + Theme Picker integrado -->
   <div class="creator-wrap">
-    <div class="creator-badge" onclick="toggleCreatorPanel(event)" title="Personalizar tema">
-      <div style="text-align:center">
-        <span class="creator-sub">· Visitas <span id="visit-count">—</span> ·</span>
-        <span class="creator-label" style="display:block">BIENVENIDOS</span>
-      </div>
+    <div class="creator-badge" onclick="toggleCreatorPanel(event)" title="Personalización" style="gap:6px;padding:6px 14px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2);flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--text2);letter-spacing:.5px">Personalizar</span>
     </div>
     <div class="creator-panel" id="creator-panel">
-      <div class="creator-panel-title">BIENVENIDOS</div>
+      <div class="creator-panel-title" style="font-size:13px;letter-spacing:1px;color:var(--text2);font-family:'Outfit',sans-serif;font-weight:600;-webkit-text-fill-color:unset;background:none;animation:none;text-align:left;padding-bottom:2px">🎨 Personalización</div>
+
+      <!-- Switch de versión -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase">Versión de interfaz</span>
+        <div style="display:flex;background:rgba(0,0,0,.3);border-radius:8px;padding:3px;gap:3px" id="skin-switcher">
+          <button onclick="switchSkin('compacta')" id="skin-btn-compacta" style="flex:1;padding:7px 8px;border-radius:6px;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--accent);color:#fff">Compacta</button>
+          <button onclick="switchSkin('avanzada')" id="skin-btn-avanzada" style="flex:1;padding:7px 8px;border-radius:6px;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--text3)">Avanzada</button>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:rgba(255,255,255,.07);margin:2px 0"></div>
+
+      <!-- Theme picker -->
+      <span style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase">Colores</span>
       <div class="tp-selector">
         <div class="tp-option" onclick="selectThemeTarget('accent')" id="tp-opt-accent">
           <div class="tp-radio selected" id="tp-radio-accent"></div>
@@ -997,7 +1010,6 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
           <span class="tp-label">Fondo</span>
         </div>
       </div>
-      <div class="tp-divider">Colores</div>
       <div class="theme-colors" id="theme-colors"></div>
       <button class="theme-reset" onclick="resetTheme()">↺ Restaurar por defecto</button>
     </div>
@@ -3962,10 +3974,37 @@ function resetTheme() {
   localStorage.removeItem("viciotv_bg");
 }
 
+function switchSkin(skin) {
+  if (skin === 'avanzada') {
+    window.location.href = 'indexSkinv2.html';
+  } else {
+    window.location.href = 'index.html';
+  }
+}
+
+function _initSkinSwitcher() {
+  const isAvanzada = window.location.pathname.includes('indexSkinv2');
+  const btnC = document.getElementById('skin-btn-compacta');
+  const btnA = document.getElementById('skin-btn-avanzada');
+  if (!btnC || !btnA) return;
+  if (isAvanzada) {
+    btnA.style.background = 'var(--accent)';
+    btnA.style.color = '#fff';
+    btnC.style.background = 'transparent';
+    btnC.style.color = 'var(--text3)';
+  } else {
+    btnC.style.background = 'var(--accent)';
+    btnC.style.color = '#fff';
+    btnA.style.background = 'transparent';
+    btnA.style.color = 'var(--text3)';
+  }
+}
+
 function toggleCreatorPanel(e) {
   e.stopPropagation();
   document.getElementById("creator-panel").classList.toggle("open");
   highlightActiveColor();
+  _initSkinSwitcher();
 }
 
 function initThemePicker() {
