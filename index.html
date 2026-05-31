@@ -4009,37 +4009,39 @@ function _sbCollapseMobile(){
   if(title) title.textContent = "Expandir";
   if(xIcon) xIcon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
 }
+function _isReallyInicio(){
+  const el = document.getElementById("sec-popular");
+  return el && el.style.display !== "none";
+}
 function sbGoFavs(){
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
-  const alreadyInicio = activeTab === "inicio";
+  const alreadyInicio = _isReallyInicio();
   if(!alreadyInicio) switchTab("inicio");
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      const el = document.getElementById("section-favs");
-      if(el && el.style.display !== "none"){
-        const top = el.getBoundingClientRect().top + window.scrollY - 72;
-        window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
-      } else window.scrollTo({top:0,behavior:"smooth"});
-    });
-  });
+  const delay = alreadyInicio ? 0 : 120;
+  setTimeout(()=>{
+    const el = document.getElementById("section-favs");
+    if(el && el.style.display !== "none"){
+      const top = el.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
+    } else window.scrollTo({top:0,behavior:"smooth"});
+  }, delay);
 }
 function sbGoContinuar(){
   _sbCollapseMobile();
   closeSearchResults();
   document.getElementById("search-input").value = "";
-  const alreadyInicio = activeTab === "inicio";
+  const alreadyInicio = _isReallyInicio();
   if(!alreadyInicio) switchTab("inicio");
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      const el = document.getElementById("viciotv-cw-container");
-      if(el){
-        const top = el.getBoundingClientRect().top + window.scrollY - 72;
-        window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
-      } else window.scrollTo({top:0,behavior:"smooth"});
-    });
-  });
+  const delay = alreadyInicio ? 0 : 120;
+  setTimeout(()=>{
+    const el = document.getElementById("viciotv-cw-container");
+    if(el && el.style.display !== "none"){
+      const top = el.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
+    } else window.scrollTo({top:0,behavior:"smooth"});
+  }, delay);
 }
 
 /* ── TOP 10 POR PLATAFORMA ── */
