@@ -213,6 +213,158 @@
   #pwa-install-btn{background:rgba(229,9,20,.12);border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;display:none;margin-left:8px;transition:background .2s;font-family:'Outfit',sans-serif}
   #pwa-install-btn:hover{background:var(--accent);color:#fff}
 
+  /* ===== SIDEBAR IZQUIERDO (colapsable, hover para expandir) ===== */
+  /* ── SIDEBAR ── */
+  #sidebar{
+    position:fixed;left:0;top:50%;transform:translateY(-50%);
+    width:38px;
+    z-index:600;
+    display:none;
+    flex-direction:column;
+    padding:6px 4px;
+    gap:2px;
+    background:rgba(10,10,15,.96);
+    border:1px solid rgba(255,255,255,.07);
+    border-left:none;
+    border-radius:0 10px 10px 0;
+    overflow:visible;
+    transition:width .25s cubic-bezier(.4,0,.2,1), box-shadow .25s ease;
+  }
+  #sidebar.visible{display:flex}
+  #sidebar:hover{
+    width:210px;
+    box-shadow:6px 0 28px rgba(0,0,0,.65);
+  }
+  /* Separador visual dentro del sidebar */
+  .sb-divider{
+    height:1px;background:rgba(255,255,255,.07);
+    margin:4px 2px;flex-shrink:0;
+  }
+  /* Botón base */
+  .sidebar-btn{
+    display:flex;align-items:center;
+    background:transparent;
+    border:none;
+    border-radius:6px;
+    padding:0;
+    color:var(--text3);
+    font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+    cursor:pointer;
+    transition:background .18s, color .18s;
+    text-align:left;width:100%;
+    white-space:nowrap;overflow:hidden;
+    flex-shrink:0;
+  }
+  .sidebar-btn:hover{ background:rgba(255,255,255,.06); color:var(--text); }
+  .sidebar-btn.active{ background:rgba(229,9,20,.12); color:var(--text); }
+  /* Ícono compacto — visible siempre, ocupa 38px de ancho */
+  .sidebar-btn .sb-icon{
+    flex-shrink:0;
+    width:38px;height:36px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* SVG icons en el ícono */
+  .sidebar-btn .sb-icon svg{ width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+  /* Badge TOP10 reemplaza el texto cuando está colapsado */
+  .sb-top10-badge{
+    display:flex;align-items:center;justify-content:center;
+    width:38px;height:36px;
+    flex-shrink:0;
+  }
+  .sb-top10-badge span{
+    background:var(--accent);color:#fff;
+    font-size:7px;font-weight:800;letter-spacing:.5px;
+    padding:2px 5px;border-radius:4px;
+    line-height:1.3;text-align:center;
+  }
+  /* Texto expandido — solo visible con hover */
+  .sidebar-btn .sb-text{
+    display:flex;align-items:center;gap:8px;flex:1;
+    opacity:0;overflow:hidden;max-width:0;
+    transition:opacity .12s ease, max-width .25s cubic-bezier(.4,0,.2,1);
+    padding-right:8px;
+  }
+  #sidebar:hover .sidebar-btn .sb-text{
+    opacity:1;max-width:200px;
+  }
+  .sidebar-btn .sb-label{
+    flex:1;line-height:1.2;display:flex;flex-direction:column;gap:1px;
+  }
+  .sidebar-btn .sb-title{font-size:12px;font-weight:600;white-space:nowrap;color:var(--text)}
+  .sidebar-btn .sb-sub{font-size:10px;color:var(--text3);white-space:nowrap}
+  /* Chevron para Top10 */
+  .sb-chevron{
+    flex-shrink:0;margin-left:auto;margin-right:4px;
+    opacity:0;transition:opacity .12s ease, transform .2s ease;
+  }
+  .sb-chevron svg{width:12px;height:12px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;}
+  #sidebar:hover .sb-chevron{opacity:1;}
+  #sidebar:hover .sb-top10-open .sb-chevron{transform:rotate(90deg);}
+  /* Submenu plataformas */
+  .sb-submenu{
+    position:fixed;
+    background:rgba(10,10,15,.98);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;
+    padding:6px;
+    display:none;flex-direction:column;gap:2px;
+    min-width:165px;
+    box-shadow:8px 0 28px rgba(0,0,0,.6);
+    z-index:1500;
+  }
+  .sb-submenu.open{display:flex}
+  .sb-submenu-header{
+    font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--text3);padding:6px 10px 4px;
+  }
+  .sb-submenu-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:6px;
+    font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;
+    color:var(--text2);cursor:pointer;
+    transition:background .15s,color .15s;
+    white-space:nowrap;border:none;background:transparent;width:100%;text-align:left;
+  }
+  .sb-submenu-item:hover{background:rgba(255,255,255,.07);color:#fff}
+  .sb-submenu-item.active{background:rgba(229,9,20,.15);color:var(--accent)}
+  /* Dot de color para cada plataforma */
+  .sb-plat-dot{
+    width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  }
+  @media(max-width:640px){#sidebar{display:none!important}}
+  /* Margen para el contenido cuando el sidebar está visible */
+  body.sidebar-open #hero,
+  body.sidebar-open #main { margin-left:42px; transition:margin-left .25s ease; }
+
+  /* Secciones especiales del sidebar */
+  #sec-netflixtop10{display:none}
+  #sec-top100{display:none}
+  #sec-mas-populares{display:none}
+  #sec-mas-recientes{display:none}
+  #sec-mejores-anime{display:none}
+
+  /* Grid para scroll infinito */
+  .infinite-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(var(--card-w),1fr));
+    gap:16px;padding:8px 32px 0;
+  }
+  .infinite-end-msg{text-align:center;color:var(--text3);font-size:.85rem;padding:24px;grid-column:1/-1}
+  .infinite-trigger{height:60px;display:flex;align-items:center;justify-content:center;margin:16px 0}
+  .top10-rank{
+    position:absolute;bottom:4px;left:6px;
+    font-family:'Bebas Neue',cursive;font-size:52px;letter-spacing:-2px;
+    color:rgba(255,255,255,.08);line-height:1;
+    text-shadow:-2px 0 0 rgba(255,255,255,.12);
+    pointer-events:none;z-index:2;
+  }
+  .top10-rank-badge{
+    position:absolute;top:8px;left:8px;
+    font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:1px;
+    background:var(--accent);color:#fff;
+    padding:2px 8px;border-radius:4px;z-index:3;
+  }
+
   /* ===== HERO ===== */
   #hero{position:relative;height:560px;overflow:hidden}
   .hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0a2e 0%,#0d1b3e 40%,var(--bg) 100%)}
@@ -721,6 +873,142 @@
   </div>
 </nav>
 
+<!-- ===== SIDEBAR IZQUIERDO ===== -->
+<div id="sidebar">
+
+  <!-- TOP 10 — badge rojo + chevron, submenu al costado -->
+  <button class="sidebar-btn focusable" id="sb-top10" onclick="togglePlatformMenu(event)">
+    <span class="sb-top10-badge"><span>TOP<br>10</span></span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Top 10</span>
+        <span class="sb-sub">Argentina hoy</span>
+      </span>
+    </span>
+    <span class="sb-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+  </button>
+
+  <!-- MÁS POPULARES -->
+  <button class="sidebar-btn focusable" id="sb-populares" onclick="openSidebarSection('mas-populares')">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Más Populares</span>
+        <span class="sb-sub">Películas y Series</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- MÁS RECIENTES -->
+  <button class="sidebar-btn focusable" id="sb-recientes" onclick="openSidebarSection('mas-recientes')">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Más Recientes</span>
+        <span class="sb-sub">Lo último</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- MEJORES ANIME -->
+  <button class="sidebar-btn focusable" id="sb-anime" onclick="openSidebarSection('mejores-anime')">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Mejores Anime</span>
+        <span class="sb-sub">Por puntuación</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- SEPARADOR -->
+  <div class="sb-divider"></div>
+
+  <!-- MIS FAVORITOS -->
+  <button class="sidebar-btn focusable" id="sb-favs" onclick="sbGoFavs()">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Mis Favoritos</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- CONTINUAR VIENDO -->
+  <button class="sidebar-btn focusable" id="sb-cw" onclick="sbGoContinuar()">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Continuar Viendo</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- SEPARADOR -->
+  <div class="sb-divider"></div>
+
+  <!-- MI PERFIL -->
+  <button class="sidebar-btn focusable" id="sb-perfil" onclick="goToProfiles()">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Mi Perfil</span>
+      </span>
+    </span>
+  </button>
+
+  <!-- SALIR -->
+  <button class="sidebar-btn focusable" id="sb-salir" onclick="goToProfiles()">
+    <span class="sb-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </span>
+    <span class="sb-text">
+      <span class="sb-label">
+        <span class="sb-title">Salir</span>
+      </span>
+    </span>
+  </button>
+
+</div>
+
+<!-- Submenu plataformas — fuera del sidebar, posicionado por JS -->
+<div class="sb-submenu" id="sb-platform-menu">
+  <div class="sb-submenu-header">Seleccioná plataforma</div>
+  <button class="sb-submenu-item" onclick="openTop10Platform('netflix','8','Netflix')">
+    <span class="sb-plat-dot" style="background:#e50914"></span>Netflix
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('prime','119','Prime Video')">
+    <span class="sb-plat-dot" style="background:#00a8e0"></span>Prime Video
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('disney','337','Disney+')">
+    <span class="sb-plat-dot" style="background:#113ccf"></span>Disney+
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('hbo','1899','HBO Max')">
+    <span class="sb-plat-dot" style="background:#a855f7"></span>HBO Max
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('paramount','531','Paramount+')">
+    <span class="sb-plat-dot" style="background:#0064ff"></span>Paramount+
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('apple','350','Apple TV+')">
+    <span class="sb-plat-dot" style="background:#f5f5f7"></span>Apple TV+
+  </button>
+  <button class="sb-submenu-item" onclick="openTop10Platform('crunchyroll','283','Crunchyroll')">
+    <span class="sb-plat-dot" style="background:#f47521"></span>Crunchyroll
+  </button>
+</div>
+
 <!-- ===== SEARCH OVERLAY ===== -->
 <div id="search-overlay">
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -846,6 +1134,61 @@
   <div id="sec-search" class="row-section" style="display:none">
     <div class="row-header"><span class="row-title" id="search-label">Resultados</span></div>
     <div class="search-results-grid" id="search-grid" style="padding:0 32px"></div>
+  </div>
+
+  <!-- ── SIDEBAR SECTIONS ── -->
+
+  <!-- Top 10 Netflix Argentina -->
+  <div id="sec-netflixtop10" class="row-section" style="display:none;padding-top:80px">
+    <div class="row-header">
+      <span class="row-title">🔴 TOP 10 NETFLIX ARGENTINA</span>
+    </div>
+    <div class="home-grid" id="grid-netflixtop10" style="padding:8px 32px 0"></div>
+  </div>
+
+  <!-- Top 100 Popular (mix) -->
+  <div id="sec-top100" class="row-section" style="display:none;padding-top:80px">
+    <div class="row-header">
+      <span class="row-title">🏆 TOP 100 MÁS POPULARES</span>
+    </div>
+    <div class="home-grid" id="grid-top100" style="padding:8px 32px 0"></div>
+    <div id="load-more-top100" style="height:10px"></div>
+  </div>
+
+  <!-- Más Populares (scroll infinito) -->
+  <div id="sec-mas-populares" class="row-section" style="display:none;padding-top:80px">
+    <div class="row-header">
+      <span class="row-title">🔥 MÁS POPULARES</span>
+    </div>
+    <div class="home-grid" id="grid-mas-populares" style="padding:8px 32px 0"></div>
+    <div class="infinite-trigger" id="trigger-mas-populares">
+      <div class="load-more-spinner skeleton" id="spinner-mas-populares" style="width:32px;height:32px;border-radius:50%;display:none;animation:spin .8s linear infinite"></div>
+      <div id="end-mas-populares" style="color:var(--text3);font-size:.85rem;display:none">— Llegaste al final —</div>
+    </div>
+  </div>
+
+  <!-- Más Recientes (scroll infinito) -->
+  <div id="sec-mas-recientes" class="row-section" style="display:none;padding-top:80px">
+    <div class="row-header">
+      <span class="row-title">🆕 MÁS RECIENTES</span>
+    </div>
+    <div class="home-grid" id="grid-mas-recientes" style="padding:8px 32px 0"></div>
+    <div class="infinite-trigger" id="trigger-mas-recientes">
+      <div class="load-more-spinner skeleton" id="spinner-mas-recientes" style="width:32px;height:32px;border-radius:50%;display:none;animation:spin .8s linear infinite"></div>
+      <div id="end-mas-recientes" style="color:var(--text3);font-size:.85rem;display:none">— Llegaste al final —</div>
+    </div>
+  </div>
+
+  <!-- Mejores Anime (scroll infinito por puntuación) -->
+  <div id="sec-mejores-anime" class="row-section" style="display:none;padding-top:80px">
+    <div class="row-header">
+      <span class="row-title">⭐ MEJORES ANIME</span>
+    </div>
+    <div class="home-grid" id="grid-mejores-anime" style="padding:8px 32px 0"></div>
+    <div class="infinite-trigger" id="trigger-mejores-anime">
+      <div class="load-more-spinner skeleton" id="spinner-mejores-anime" style="width:32px;height:32px;border-radius:50%;display:none;animation:spin .8s linear infinite"></div>
+      <div id="end-mejores-anime" style="color:var(--text3);font-size:.85rem;display:none">— Llegaste al final —</div>
+    </div>
   </div>
 
 </main>
@@ -2726,6 +3069,7 @@ function selectProfile(p) {
   renderFavs();
   renderContinueWatching();
   initContent();
+  showSidebar();
   // Contar visita por perfil — cada perfil tiene su propio cooldown de 2hs
   registerVisit(p.name);
 }
@@ -3225,6 +3569,7 @@ function initApp() {
     renderFavs();
     renderContinueWatching();
     initContent();
+    showSidebar();
     registerVisit(active ? active.name : saved);
   } else {
     document.getElementById("profiles-screen").style.display = "flex";
@@ -3385,6 +3730,264 @@ function initThemePicker() {
       panel.classList.remove("open");
     }
   });
+}
+
+// ─── SIDEBAR ───
+
+/* Mostrar sidebar cuando hay sesión activa */
+function showSidebar(){
+  const s = document.getElementById("sidebar");
+  if(s){ s.classList.add("visible"); document.body.classList.add("sidebar-open"); }
+}
+
+/* Secciones extras del sidebar */
+const SIDEBAR_SECTIONS = ["netflixtop10","mas-populares","mas-recientes","mejores-anime"];
+const _sbState = {
+  "mas-populares":{page:1,total:1,loading:false,ended:false,observer:null},
+  "mas-recientes":{page:1,total:1,loading:false,ended:false,observer:null},
+  "mejores-anime":{page:1,total:1,loading:false,ended:false,observer:null},
+};
+
+let _activeSidebarSection = null;
+
+function openSidebarSection(key){
+  try { _destroyMovieFrame(); } catch(e) {}
+  document.getElementById("modal-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+
+  const allMain = [
+    "sec-popular","sec-nowplaying","sec-tvtrending",
+    "sec-movies-popular","sec-movies-top","sec-movies-action",
+    "sec-series-popular","sec-series-top","sec-series-drama",
+    "sec-anime","sec-anime-top","sec-canales","sec-search","sec-catalog",
+    "section-favs","viciotv-cw-container",
+    "sec-netflixtop10","sec-top100","sec-mas-populares","sec-mas-recientes","sec-mejores-anime"
+  ];
+  allMain.forEach(id => { const el=document.getElementById(id); if(el) el.style.display="none"; });
+  document.getElementById("hero").style.display = "none";
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+
+  document.querySelectorAll(".sidebar-btn").forEach(b=>b.classList.remove("active"));
+  const _sbIdMap = {"netflixtop10":"sb-top10","mas-populares":"sb-populares","mas-recientes":"sb-recientes","mejores-anime":"sb-anime"};
+  const activeBtn = document.getElementById(_sbIdMap[key]);
+  if(activeBtn) activeBtn.classList.add("active");
+
+  _activeSidebarSection = key;
+  const sec = document.getElementById("sec-"+key);
+  if(sec) sec.style.display = "block";
+  window.scrollTo({top:0,behavior:"smooth"});
+
+  if(key === "netflixtop10") _loadNetflixTop10();
+  else if(key === "mas-populares") _initInfiniteSection("mas-populares");
+  else if(key === "mas-recientes") _initInfiniteSection("mas-recientes");
+  else if(key === "mejores-anime") _initInfiniteSection("mejores-anime");
+}
+
+/* ── TOGGLE SUBMENU PLATAFORMAS ── */
+function togglePlatformMenu(e){
+  e.stopPropagation();
+  const menu = document.getElementById("sb-platform-menu");
+  const btn  = document.getElementById("sb-top10");
+  const isOpen = menu.classList.contains("open");
+  document.querySelectorAll(".sb-submenu.open").forEach(m=>m.classList.remove("open"));
+  if(!isOpen){
+    const rect = btn.getBoundingClientRect();
+    const sidebar = document.getElementById("sidebar");
+    const sRect = sidebar.getBoundingClientRect();
+    menu.style.top  = rect.top + "px";
+    menu.style.left = (sRect.right + 6) + "px";
+    menu.classList.add("open");
+    btn.classList.add("active");
+    btn.classList.add("sb-top10-open");
+  } else {
+    btn.classList.remove("active");
+    btn.classList.remove("sb-top10-open");
+  }
+}
+document.addEventListener("click", function(e){
+  const menu = document.getElementById("sb-platform-menu");
+  const btn  = document.getElementById("sb-top10");
+  if(menu && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
+    menu.classList.remove("open");
+    if(btn){ btn.classList.remove("active"); btn.classList.remove("sb-top10-open"); }
+  }
+});
+
+/* ── Favoritos y Continuar Viendo desde sidebar ── */
+function sbGoFavs(){
+  closeSearchResults();
+  document.getElementById("search-input").value = "";
+  switchTab("inicio", { skipScroll: true });
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const el = document.getElementById("section-favs");
+      if(el && el.style.display !== "none"){
+        const top = el.getBoundingClientRect().top + window.scrollY - 72;
+        window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
+      } else window.scrollTo({top:0,behavior:"smooth"});
+    });
+  });
+}
+function sbGoContinuar(){
+  closeSearchResults();
+  document.getElementById("search-input").value = "";
+  switchTab("inicio", { skipScroll: true });
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const el = document.getElementById("viciotv-cw-container");
+      if(el){
+        const top = el.getBoundingClientRect().top + window.scrollY - 72;
+        window.scrollTo({top: Math.max(0, top), behavior:"smooth"});
+      } else window.scrollTo({top:0,behavior:"smooth"});
+    });
+  });
+}
+
+/* ── TOP 10 POR PLATAFORMA ── */
+let _activeTop10Platform = null;
+async function openTop10Platform(platformKey, providerId, platformName){
+  document.querySelectorAll(".sb-submenu-item").forEach(b=>b.classList.remove("active"));
+  event?.target?.closest(".sb-submenu-item")?.classList.add("active");
+  const pm = document.getElementById("sb-platform-menu");
+  if(pm){ pm.classList.remove("open"); }
+  const top10Btn = document.getElementById("sb-top10");
+  if(top10Btn){ top10Btn.classList.remove("sb-top10-open"); }
+
+  openSidebarSection("netflixtop10");
+  if(top10Btn) top10Btn.classList.add("active");
+
+  _activeTop10Platform = platformKey;
+  const titleEl = document.querySelector("#sec-netflixtop10 .row-title");
+  if(titleEl) titleEl.textContent = `TOP 10 ${platformName.toUpperCase()} — ARGENTINA`;
+
+  _netflixTop10Loaded = false;
+  _currentTop10Provider = providerId;
+  const grid = document.getElementById("grid-netflixtop10");
+  if(grid) grid.innerHTML = "";
+  _loadNetflixTop10();
+}
+
+let _currentTop10Provider = "8";
+let _netflixTop10Loaded = false;
+async function _loadNetflixTop10(){
+  if(_netflixTop10Loaded) return;
+  _netflixTop10Loaded = true;
+  const grid = document.getElementById("grid-netflixtop10");
+  grid.innerHTML = "";
+  for(let i=0;i<10;i++){
+    const sk=document.createElement("div"); sk.className="skeleton skeleton-card";
+    sk.style.cssText="height:calc(var(--card-h)+56px);border-radius:var(--radius)";
+    grid.appendChild(sk);
+  }
+  try {
+    const pid = _currentTop10Provider;
+    const [rM, rT] = await Promise.all([
+      fetch(`${API_BASE}/discover/movie?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=1`).then(r=>r.json()),
+      fetch(`${API_BASE}/discover/tv?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=1`).then(r=>r.json()),
+    ]);
+    const movies = (rM.results||[]).slice(0,5).map(m=>({...m,_type:"movie"}));
+    const shows  = (rT.results||[]).slice(0,5).map(m=>({...m,_type:"tv"}));
+    const combined = [...movies,...shows].sort((a,b)=>b.popularity-a.popularity).slice(0,10);
+    grid.innerHTML="";
+    combined.forEach((item,i)=>{
+      const card = buildCard(item,i);
+      const rank = document.createElement("div");
+      rank.className="top10-rank"; rank.textContent=i+1;
+      card.style.position="relative";
+      card.appendChild(rank);
+      const badge = document.createElement("div");
+      badge.className="top10-rank-badge"; badge.textContent=`#${i+1}`;
+      card.appendChild(badge);
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    grid.innerHTML=`<div style="color:var(--text3);padding:40px;grid-column:1/-1">Error al cargar. Revisá tu conexión.</div>`;
+  }
+}
+
+/* ── SCROLL INFINITO GENÉRICO (populares / recientes / anime) ── */
+function _initInfiniteSection(key){
+  const state = _sbState[key];
+  if(state.observer || state.ended || state.page > 1) {
+    if(!state.observer) _setupInfiniteObserver(key);
+    return;
+  }
+  state.page=1; state.total=1; state.loading=false; state.ended=false;
+  const grid=document.getElementById("grid-"+key);
+  if(grid) grid.innerHTML="";
+  const endEl=document.getElementById("end-"+key);
+  if(endEl) endEl.style.display="none";
+  _loadInfinitePage(key).then(()=>_setupInfiniteObserver(key));
+}
+
+async function _loadInfinitePage(key){
+  const state = _sbState[key];
+  if(state.loading||state.ended) return;
+  state.loading=true;
+  const spinner=document.getElementById("spinner-"+key);
+  const grid=document.getElementById("grid-"+key);
+  if(spinner) spinner.style.display="block";
+
+  if(key === "mejores-anime"){
+    try {
+      const r = await fetch(`${API_BASE}/discover/tv?api_key=${API_KEY}&language=es-MX&with_genres=16&with_origin_country=JP&sort_by=vote_average.desc&vote_count.gte=200&page=${state.page}`).then(r=>r.json());
+      state.total = Math.min(r.total_pages||1, 500);
+      const items = (r.results||[]).map(m=>({...m,_type:"tv"}));
+      if(state.page===1) grid.innerHTML="";
+      items.forEach((item,i)=>grid.appendChild(buildCard(item,i)));
+      state.page++;
+      if(state.page>state.total){
+        state.ended=true;
+        const endEl=document.getElementById("end-"+key);
+        if(endEl) endEl.style.display="block";
+      }
+    } catch(e){
+      if(state.page===1) grid.innerHTML=`<div style="color:var(--text3);padding:40px;grid-column:1/-1">Error al cargar.</div>`;
+    }
+    if(spinner) spinner.style.display="none";
+    state.loading=false;
+    return;
+  }
+
+  const sort = key==="mas-recientes" ? "release_date.desc" : "popularity.desc";
+  const extraMovie = key==="mas-recientes" ? `&primary_release_date.gte=2023-01-01` : "";
+  const extraTV    = key==="mas-recientes" ? `&first_air_date.gte=2023-01-01` : "";
+
+  try {
+    const [rM, rT] = await Promise.all([
+      fetch(`${API_BASE}/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=${sort}&page=${state.page}${extraMovie}`).then(r=>r.json()),
+      fetch(`${API_BASE}/discover/tv?api_key=${API_KEY}&language=es-MX&sort_by=${sort}&page=${state.page}${extraTV}`).then(r=>r.json()),
+    ]);
+    state.total = Math.min(Math.max(rM.total_pages||1, rT.total_pages||1), 500);
+    const movies = (rM.results||[]).map(m=>({...m,_type:"movie"}));
+    const shows  = (rT.results||[]).map(m=>({...m,_type:"tv"}));
+    const combined = [...movies,...shows].sort((a,b)=>b.popularity-a.popularity);
+    if(state.page===1) grid.innerHTML="";
+    combined.forEach((item,i)=>grid.appendChild(buildCard(item,i)));
+    state.page++;
+    if(state.page>state.total){
+      state.ended=true;
+      const endEl=document.getElementById("end-"+key);
+      if(endEl) endEl.style.display="block";
+    }
+  } catch(e){
+    if(state.page===1) grid.innerHTML=`<div style="color:var(--text3);padding:40px;grid-column:1/-1">Error al cargar.</div>`;
+  }
+  if(spinner) spinner.style.display="none";
+  state.loading=false;
+}
+
+function _setupInfiniteObserver(key){
+  const state=_sbState[key];
+  if(state.observer) state.observer.disconnect();
+  const trigger=document.getElementById("trigger-"+key);
+  if(!trigger) return;
+  state.observer=new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting && !state.loading && !state.ended){
+      _loadInfinitePage(key);
+    }
+  },{rootMargin:"400px",threshold:0});
+  state.observer.observe(trigger);
 }
 
 // ─── ARRANQUE ───
