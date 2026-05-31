@@ -331,10 +331,41 @@
   .sb-plat-dot{
     width:8px;height:8px;border-radius:50%;flex-shrink:0;
   }
-  @media(max-width:640px){#sidebar{display:none!important}}
+  /* ===== SIDEBAR EN MOBILE: igual que desktop, siempre visible ===== */
+  @media(max-width:640px){
+    /* El sidebar se muestra colapsado (38px) igual que en desktop */
+    #sidebar{
+      /* sobreescribir hover con clase .expanded en mobile */
+    }
+    /* Cuando está expandido por tap en mobile */
+    #sidebar.mob-expanded{
+      width:210px;
+      box-shadow:6px 0 28px rgba(0,0,0,.65);
+    }
+    #sidebar.mob-expanded .sidebar-btn .sb-text{
+      opacity:1;max-width:200px;
+    }
+    #sidebar.mob-expanded .sb-chevron{opacity:1;}
+    #sidebar.mob-expanded .sb-top10-open .sb-chevron{transform:rotate(90deg);}
+    /* En mobile el hover no funciona bien (no hay cursor), usamos .mob-expanded */
+    #sidebar:hover{ width:38px; box-shadow:none; }
+    #sidebar:hover .sidebar-btn .sb-text{ opacity:0; max-width:0; }
+    #sidebar:hover .sb-chevron{ opacity:0; }
+  }
+
+  
   /* Margen para el contenido cuando el sidebar está visible */
   body.sidebar-open #hero,
-  body.sidebar-open #main { margin-left:42px; transition:margin-left .25s ease; }
+  body.sidebar-open #main { margin-left:25px; transition:margin-left .25s ease; }
+
+  @media(max-width:640px){
+    /* En mobile el sidebar siempre está visible cuando hay sesión → siempre corremos el contenido */
+    body.sidebar-open #hero,
+    body.sidebar-open #main { margin-left:25px; }
+    /* Cuando está expandido, el contenido se corre más */
+    body.sidebar-mob-expanded #hero,
+    body.sidebar-mob-expanded #main { margin-left:128px; transition:margin-left .25s cubic-bezier(.4,0,.2,1); }
+  }
 
   /* Secciones especiales del sidebar */
   #sec-netflixtop10{display:none}
@@ -969,14 +1000,14 @@
     </span>
   </button>
 
-  <!-- SALIR -->
-  <button class="sidebar-btn focusable" id="sb-salir" onclick="goToProfiles()">
-    <span class="sb-icon">
+  <!-- EXPANDIR (mobile) / SALIR (desktop) -->
+  <button class="sidebar-btn focusable" id="sb-salir" onclick="sbToggleExpand()">
+    <span class="sb-icon" id="sb-expand-icon">
       <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </span>
     <span class="sb-text">
       <span class="sb-label">
-        <span class="sb-title">Salir</span>
+        <span class="sb-title" id="sb-salir-title">Salir</span>
       </span>
     </span>
   </button>
@@ -1144,6 +1175,10 @@
       <span class="row-title">🔴 TOP 10 NETFLIX ARGENTINA</span>
     </div>
     <div class="home-grid" id="grid-netflixtop10" style="padding:8px 32px 0"></div>
+    <div style="text-align:center;padding:20px 0 8px" id="top10-load-more-wrap" style="display:none">
+      <button id="top10-load-more-btn" class="load-more-btn" onclick="top10LoadMore()" style="display:none">Ver más</button>
+      <div id="top10-load-spinner" style="display:none;color:var(--text3);font-size:13px;padding:8px">Cargando...</div>
+    </div>
   </div>
 
   <!-- Top 100 Popular (mix) -->
@@ -2551,8 +2586,12 @@ function switchTab(tab) {
     "sec-movies-popular","sec-movies-top","sec-movies-action",
     "sec-series-popular","sec-series-top","sec-series-drama",
     "sec-anime","sec-anime-top","sec-canales","sec-search","sec-catalog",
-    "section-favs","viciotv-cw-container"
+    "section-favs","viciotv-cw-container",
+    "sec-netflixtop10","sec-top100","sec-mas-populares","sec-mas-recientes","sec-mejores-anime"
   ];
+  // Limpiar estado de sección activa del sidebar al cambiar de tab
+  _activeSidebarSection = null;
+  document.querySelectorAll(".sidebar-btn").forEach(b=>b.classList.remove("active"));
   allSections.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -3738,6 +3777,41 @@ function initThemePicker() {
 function showSidebar(){
   const s = document.getElementById("sidebar");
   if(s){ s.classList.add("visible"); document.body.classList.add("sidebar-open"); }
+  // En mobile, init del botón de expandir
+  _sbMobileInit();
+}
+
+function _sbMobileInit(){
+  if(window.innerWidth > 640) return;
+  const icon = document.getElementById("sb-expand-icon");
+  const title = document.getElementById("sb-salir-title");
+  // Mostrar icono de expandir (flechas) en mobile
+  if(icon) icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
+  if(title) title.textContent = "Expandir";
+}
+
+function sbToggleExpand(){
+  if(window.innerWidth > 640){
+    // Desktop: comportamiento original = salir
+    goToProfiles();
+    return;
+  }
+  // Mobile: toggle expand
+  const s = document.getElementById("sidebar");
+  const icon = document.getElementById("sb-expand-icon");
+  const title = document.getElementById("sb-salir-title");
+  const expanded = s.classList.toggle("mob-expanded");
+  document.body.classList.toggle("sidebar-mob-expanded", expanded);
+  // Rotar icono
+  if(icon){
+    if(expanded){
+      icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>';
+      if(title) title.textContent = "Colapsar";
+    } else {
+      icon.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>';
+      if(title) title.textContent = "Expandir";
+    }
+  }
 }
 
 /* Secciones extras del sidebar */
@@ -3777,8 +3851,7 @@ function openSidebarSection(key){
   if(sec) sec.style.display = "block";
   window.scrollTo({top:0,behavior:"smooth"});
 
-  if(key === "netflixtop10") _loadNetflixTop10();
-  else if(key === "mas-populares") _initInfiniteSection("mas-populares");
+  if(key === "mas-populares") _initInfiniteSection("mas-populares");
   else if(key === "mas-recientes") _initInfiniteSection("mas-recientes");
   else if(key === "mejores-anime") _initInfiniteSection("mejores-anime");
 }
@@ -3869,40 +3942,123 @@ async function openTop10Platform(platformKey, providerId, platformName){
 
 let _currentTop10Provider = "8";
 let _netflixTop10Loaded = false;
+
+// Estado de paginación del Top10
+const _top10State = {
+  page: 1,        // página actual de la API (cada página trae 20 items)
+  buffer: [],     // items cargados de la API pero todavía no mostrados
+  shown: 0,       // cantidad de items ya mostrados en la grilla
+  loading: false,
+  ended: false,
+};
+
 async function _loadNetflixTop10(){
   if(_netflixTop10Loaded) return;
   _netflixTop10Loaded = true;
+
+  // Reset estado
+  _top10State.page = 1;
+  _top10State.buffer = [];
+  _top10State.shown = 0;
+  _top10State.loading = false;
+  _top10State.ended = false;
+
   const grid = document.getElementById("grid-netflixtop10");
   grid.innerHTML = "";
+  // Skeletons iniciales
   for(let i=0;i<10;i++){
     const sk=document.createElement("div"); sk.className="skeleton skeleton-card";
     sk.style.cssText="height:calc(var(--card-h)+56px);border-radius:var(--radius)";
     grid.appendChild(sk);
   }
+
+  // Ocultar botón "Ver más" mientras carga la primera tanda
+  const btn = document.getElementById("top10-load-more-btn");
+  if(btn) btn.style.display="none";
+
+  await _top10FetchPage();
+  await _top10RenderNext(10);
+}
+
+// Trae una página de la API y la acumula en el buffer
+async function _top10FetchPage(){
+  if(_top10State.loading || _top10State.ended) return;
+  _top10State.loading = true;
+  const pid = _currentTop10Provider;
+  const pg  = _top10State.page;
   try {
-    const pid = _currentTop10Provider;
     const [rM, rT] = await Promise.all([
-      fetch(`${API_BASE}/discover/movie?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=1`).then(r=>r.json()),
-      fetch(`${API_BASE}/discover/tv?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=1`).then(r=>r.json()),
+      fetch(`${API_BASE}/discover/movie?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=${pg}`).then(r=>r.json()),
+      fetch(`${API_BASE}/discover/tv?api_key=${API_KEY}&language=es-MX&with_watch_providers=${pid}&watch_region=AR&sort_by=popularity.desc&page=${pg}`).then(r=>r.json()),
     ]);
-    const movies = (rM.results||[]).slice(0,5).map(m=>({...m,_type:"movie"}));
-    const shows  = (rT.results||[]).slice(0,5).map(m=>({...m,_type:"tv"}));
-    const combined = [...movies,...shows].sort((a,b)=>b.popularity-a.popularity).slice(0,10);
-    grid.innerHTML="";
-    combined.forEach((item,i)=>{
-      const card = buildCard(item,i);
-      const rank = document.createElement("div");
-      rank.className="top10-rank"; rank.textContent=i+1;
-      card.style.position="relative";
-      card.appendChild(rank);
-      const badge = document.createElement("div");
-      badge.className="top10-rank-badge"; badge.textContent=`#${i+1}`;
-      card.appendChild(badge);
-      grid.appendChild(card);
-    });
-  } catch(e) {
-    grid.innerHTML=`<div style="color:var(--text3);padding:40px;grid-column:1/-1">Error al cargar. Revisá tu conexión.</div>`;
+    const movies = (rM.results||[]).map(m=>({...m,_type:"movie"}));
+    const shows  = (rT.results||[]).map(m=>({...m,_type:"tv"}));
+    // Mezclar por popularidad para que la lista sea variada
+    const combined = [...movies,...shows].sort((a,b)=>b.popularity-a.popularity);
+    _top10State.buffer.push(...combined);
+    _top10State.page++;
+    // Si ambas APIs devolvieron menos de 20 resultados, ya no hay más páginas
+    if((rM.results||[]).length < 20 && (rT.results||[]).length < 20){
+      _top10State.ended = true;
+    }
+  } catch(e){
+    const grid = document.getElementById("grid-netflixtop10");
+    if(_top10State.shown === 0){
+      grid.innerHTML=`<div style="color:var(--text3);padding:40px;grid-column:1/-1">Error al cargar. Revisá tu conexión.</div>`;
+    }
   }
+  _top10State.loading = false;
+}
+
+// Muestra los próximos `count` items del buffer en la grilla
+async function _top10RenderNext(count){
+  const grid = document.getElementById("grid-netflixtop10");
+  const btn   = document.getElementById("top10-load-more-btn");
+  const spin  = document.getElementById("top10-load-spinner");
+
+  // Si el buffer no tiene suficientes, traer más páginas
+  while(_top10State.buffer.length < count && !_top10State.ended){
+    if(spin) spin.style.display="block";
+    if(btn)  btn.style.display="none";
+    await _top10FetchPage();
+  }
+  if(spin) spin.style.display="none";
+
+  // Si es la primera renderización, limpiar skeletons
+  if(_top10State.shown === 0) grid.innerHTML="";
+
+  const toShow = _top10State.buffer.splice(0, count);
+  toShow.forEach((item, idx)=>{
+    const globalRank = _top10State.shown + idx + 1;
+    const card = buildCard(item, idx);
+    card.style.position="relative";
+    const rank = document.createElement("div");
+    rank.className="top10-rank"; rank.textContent=globalRank;
+    card.appendChild(rank);
+    const badge = document.createElement("div");
+    badge.className="top10-rank-badge"; badge.textContent=`#${globalRank}`;
+    card.appendChild(badge);
+    grid.appendChild(card);
+  });
+  _top10State.shown += toShow.length;
+
+  // Mostrar/ocultar botón "Ver más"
+  const hayMas = _top10State.buffer.length > 0 || !_top10State.ended;
+  if(btn){
+    btn.style.display = hayMas ? "inline-block" : "none";
+    btn.disabled = false;
+    btn.textContent = "Ver más";
+  }
+}
+
+// Llamado por el botón "Ver más"
+async function top10LoadMore(){
+  const btn  = document.getElementById("top10-load-more-btn");
+  const spin = document.getElementById("top10-load-spinner");
+  if(btn){ btn.disabled=true; btn.textContent="Cargando..."; }
+  if(spin) spin.style.display="block";
+  await _top10RenderNext(10);
+  if(spin) spin.style.display="none";
 }
 
 /* ── SCROLL INFINITO GENÉRICO (populares / recientes / anime) ── */
@@ -3989,6 +4145,8 @@ function _setupInfiniteObserver(key){
   },{rootMargin:"400px",threshold:0});
   state.observer.observe(trigger);
 }
+
+
 
 // ─── ARRANQUE ───
 initApp();
